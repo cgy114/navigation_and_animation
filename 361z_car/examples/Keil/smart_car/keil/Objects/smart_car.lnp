@@ -1,0 +1,18 @@
+--cpu Cortex-M0+
+".\objects\car_main.o"
+".\objects\startup_mspm0g350x_uvision.o"
+".\objects\ti_msp_dl_config.o"
+".\objects\uart_imu.o"
+".\objects\encoder.o"
+".\objects\motor.o"
+".\objects\oled.o"
+".\objects\mid_debug_uart.o"
+".\objects\mid_timer.o"
+".\objects\pid.o"
+".\objects\odometry.o"
+".\objects\motion.o"
+".\objects\command.o"
+--library_type=microlib --strict --scatter "./mspm0g3507.sct"
+../../source/ti/driverlib/lib/keil/m0p/mspm0g1x0x_g3x0x/driverlib.a --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\smart_car.map" -o .\Objects\smart_car.axf

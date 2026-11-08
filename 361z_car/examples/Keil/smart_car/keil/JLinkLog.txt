@@ -1,0 +1,47 @@
+TB4D0 003:926.165   SEGGER J-Link V9.92 Log File
+TB4D0 003:926.334   DLL Compiled: Nov  4 2026 12:41:05
+TB4D0 003:926.388   Logging started @ 2026-11-05 16:54
+TB4D0 003:926.434   Process: C:\Users\21415\AppData\Local\Keil_v5\UV4\UV4.exe
+TB4D0 003:926.492 - 3926.479ms 
+TB4D0 003:926.548 JLINK_SetWarnOutHandler(...)
+TB4D0 003:926.594 - 0.048ms 
+TB4D0 003:926.646 JLINK_OpenEx(...)
+TB4D0 003:927.532   
+  ***** Error: 
+TB4D0 003:927.613   Cannot connect to the probe/programmer.
+TB4D0 003:927.880 - 1.233ms returns "Cannot connect to the probe/programmer."
+TB4D0 003:928.086 
+  ***** Warning: 
+TB4D0 003:928.168 API Error: API JLINK_GetHardwareVersion function called before JLINKARM_Open()
+TB4D0 003:928.237 JLINK_GetHardwareVersion()
+TB4D0 003:929.219   
+  ***** Error: 
+TB4D0 003:929.268   Cannot connect to the probe/programmer.
+TB4D0 003:929.448 - 1.211ms
+TB4D0 008:099.947 JLINK_IsOpen()
+TB4D0 008:100.011 - 0.050ms returns 0x00
+TB4D0 008:100.038 JLINK_EMU_SelectByUSBSN(SerialNo = 0)
+TB4D0 008:100.784 - 0.745ms returns 0xFFFFFFFF
+TB4D0 008:100.819 JLINK_EnableLog(...)
+TB4D0 008:100.844 - 0.024ms 
+TB4D0 008:100.869 JLINK_SetLogFile(...)
+TB4D0 008:100.894 - 0.024ms 
+TB4D0 008:100.920 JLINK_SetWarnOutHandler(...)
+TB4D0 008:100.944 - 0.024ms 
+TB4D0 008:100.969 JLINK_OpenEx(...)
+TB4D0 008:101.549   
+  ***** Error: 
+TB4D0 008:101.593   Cannot connect to the probe/programmer.
+TB4D0 008:101.853 - 0.881ms returns "Cannot connect to the probe/programmer."
+TB4D0 008:102.043 
+  ***** Warning: 
+TB4D0 008:102.087 API Error: API JLINK_GetHardwareVersion function called before JLINKARM_Open()
+TB4D0 008:102.126 JLINK_GetHardwareVersion()
+TB4D0 008:102.725   
+  ***** Error: 
+TB4D0 008:102.769   Cannot connect to the probe/programmer.
+TB4D0 008:102.966 - 0.839ms
+TB4D0 052:222.488 JLINK_Close()
+TB4D0 052:223.288 - 0.795ms
+TB4D0 052:223.332   
+TB4D0 052:223.356   Closed
