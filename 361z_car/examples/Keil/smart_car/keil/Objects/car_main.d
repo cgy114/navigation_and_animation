@@ -80,4 +80,5 @@
   ../../source\ti/driverlib/m0p/dl_systick.h ../middle\mid_debug_uart.h \
   ../middle\mid_timer.h ../hardware\uart_imu.h ../hardware\encoder.h \
   ../hardware\motor.h ../app\motion.h ../app/odometry.h ../app\command.h \
-  ../hardware\oled.h
+  ../hardware\oled.h ../app\pid_store.h ../hardware\servo.h \
+  ../hardware\battery.h

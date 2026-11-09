@@ -146,21 +146,6 @@ extern "C" {
 /* PB8: software I2C data */
 #define GPIO_OLED_PIN_SDA_PIN                                   (DL_GPIO_PIN_8)
 #define GPIO_OLED_PIN_SDA_IOMUX                                  (IOMUX_PINCM25)
-/* Port definition for Pin Group GPIO_KEY */
-#define GPIO_KEY_PORT                                                    (GPIOA)
-
-/* Defines for PIN_UP: GPIOA.9 with pinCMx 20 on package pin 55 */
-#define GPIO_KEY_PIN_UP_PIN                                      (DL_GPIO_PIN_9)
-#define GPIO_KEY_PIN_UP_IOMUX                                    (IOMUX_PINCM20)
-/* Defines for PIN_LEFT: GPIOA.8 with pinCMx 19 on package pin 54 */
-#define GPIO_KEY_PIN_LEFT_PIN                                    (DL_GPIO_PIN_8)
-#define GPIO_KEY_PIN_LEFT_IOMUX                                  (IOMUX_PINCM19)
-/* Defines for PIN_RIGHT: GPIOA.31 with pinCMx 6 on package pin 39 */
-#define GPIO_KEY_PIN_RIGHT_PIN                                  (DL_GPIO_PIN_31)
-#define GPIO_KEY_PIN_RIGHT_IOMUX                                  (IOMUX_PINCM6)
-/* Defines for PIN_DOWN: GPIOA.28 with pinCMx 3 on package pin 35 */
-#define GPIO_KEY_PIN_DOWN_PIN                                   (DL_GPIO_PIN_28)
-#define GPIO_KEY_PIN_DOWN_IOMUX                                   (IOMUX_PINCM3)
 /* Port definition for Pin Group GPIO_ENCODER */
 #define GPIO_ENCODER_PORT                                                (GPIOB)
 

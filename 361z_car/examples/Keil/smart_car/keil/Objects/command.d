@@ -79,4 +79,5 @@
   ../../source\ti/driverlib/dl_wwdt.h \
   ../../source\ti/driverlib/m0p/dl_interrupt.h \
   ../../source\ti/driverlib/m0p/dl_systick.h ../middle\mid_timer.h \
-  ../app/motion.h ../app/odometry.h ../hardware\encoder.h
+  ../app/motion.h ../app/odometry.h ../hardware\encoder.h \
+  ../app/pid_store.h ../hardware\servo.h ../hardware\battery.h

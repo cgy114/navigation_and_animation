@@ -6,12 +6,15 @@
 ".\objects\encoder.o"
 ".\objects\motor.o"
 ".\objects\oled.o"
+".\objects\servo.o"
+".\objects\battery.o"
 ".\objects\mid_debug_uart.o"
 ".\objects\mid_timer.o"
 ".\objects\pid.o"
 ".\objects\odometry.o"
 ".\objects\motion.o"
 ".\objects\command.o"
+".\objects\pid_store.o"
 --library_type=microlib --strict --scatter "./mspm0g3507.sct"
 ../../source/ti/driverlib/lib/keil/m0p/mspm0g1x0x_g3x0x/driverlib.a --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

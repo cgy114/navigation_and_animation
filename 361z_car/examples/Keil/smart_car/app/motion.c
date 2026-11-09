@@ -9,6 +9,9 @@ static PID pid_right;
 
 static float target_v = 0.0f;
 static float target_w = 0.0f;
+static int32_t direct_left = 0;
+static int32_t direct_right = 0;
+static int direct_mode = 0;
 
 void motion_init(void)
 {
@@ -16,6 +19,7 @@ void motion_init(void)
     pid_init(&pid_right, 4000.0f, 1500.0f, 0.0f, 10000.0f, 5000.0f);
     target_v = 0.0f;
     target_w = 0.0f;
+    direct_mode = 0;
     odom_init();
 }
 
@@ -28,12 +32,31 @@ void motion_set_target(float v_mps, float w_radps)
 
     target_v = v_mps;
     target_w = w_radps;
+    if (direct_mode)
+    {
+        pid_reset(&pid_left);
+        pid_reset(&pid_right);
+        direct_mode = 0;
+    }
+}
+
+void motion_set_direct_pwm(int32_t left, int32_t right)
+{
+    target_v = 0.0f;
+    target_w = 0.0f;
+    pid_reset(&pid_left);
+    pid_reset(&pid_right);
+    direct_left = left;
+    direct_right = right;
+    direct_mode = 1;
+    motor_set(left, right);
 }
 
 void motion_stop(void)
 {
     target_v = 0.0f;
     target_w = 0.0f;
+    direct_mode = 0;
     pid_reset(&pid_left);
     pid_reset(&pid_right);
     motor_stop();
@@ -45,6 +68,13 @@ void motion_set_pid(float kp, float ki, float kd)
     pid_init(&pid_right, kp, ki, kd, 10000.0f, 5000.0f);
 }
 
+void motion_get_pid(float *kp, float *ki, float *kd)
+{
+    *kp = pid_left.kp;
+    *ki = pid_left.ki;
+    *kd = pid_left.kd;
+}
+
 void motion_update(int left_delta, int right_delta, float yaw_rad, int imu_ok)
 {
     float v_left;
@@ -53,6 +83,13 @@ void motion_update(int left_delta, int right_delta, float yaw_rad, int imu_ok)
     float target_right;
     float pwm_left;
     float pwm_right;
+
+    if (direct_mode)
+    {
+        odom_update(left_delta, right_delta, yaw_rad, imu_ok);
+        motor_set(direct_left, direct_right);
+        return;
+    }
 
     if (!imu_ok)
     {

@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1526">
+  <title>MSPM0G3507 本地串口工具</title>
+  <style>
+:root{color-scheme:dark;font-family:Inter,"Microsoft YaHei",system-ui,sans-serif;background:#0a1020;color:#e9eefb}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 78% -20%,#15284b 0,transparent 42%),#0a1020;min-height:100vh}.shell{max-width:1460px;margin:auto;padding:0 34px}.topbar{height:88px;border-bottom:1px solid #263149;display:flex;justify-content:space-between;align-items:center}.brand{display:flex;gap:14px;align-items:center}.brand-mark{width:44px;height:44px;border-radius:12px;background:#2868ed;display:grid;place-items:center;font-size:16px;font-weight:900;letter-spacing:-1px;box-shadow:0 8px 30px #1c5fe84d}.brand strong{font-size:13px;letter-spacing:.18em;display:block}.brand small{color:#8393af;font-size:11px;display:block;margin-top:4px}.top-actions{display:flex;gap:11px;align-items:center}.port-pill{border:1px solid #2a3650;border-radius:100px;padding:10px 16px;display:flex;gap:9px;align-items:center;font-size:12px;color:#b9c4da}.status-dot{width:7px;height:7px;border-radius:50%;background:#71809b}.status-dot.success{background:#4dddac;box-shadow:0 0 10px #4dddac}.status-dot.error{background:#fb7078}.button{appearance:none;border:1px solid transparent;border-radius:9px;padding:12px 18px;color:#e9eefb;background:#1b2842;cursor:pointer;font:600 13px inherit;transition:.15s}.button:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.12)}.button:disabled{opacity:.42;cursor:not-allowed}.button-primary{background:#2f6df4;border-color:#5388fb;box-shadow:0 4px 18px #1656e33d;color:white;font-weight:700}.button-quiet{background:transparent;border-color:#2c3955}.button-outline{background:transparent;border-color:#4269ad;color:#c9dcff}.hero{display:flex;justify-content:space-between;gap:25px;align-items:end;padding:54px 0 36px}.eyebrow,.section-index{color:#70a5ff;font-size:11px;font-weight:800;letter-spacing:.18em}.hero h1{font-size:clamp(30px,3.2vw,48px);letter-spacing:-.045em;margin:12px 0 13px}.hero p{margin:0;color:#9baac3;font-size:14px;line-height:1.8}.hero-chip{min-width:195px;border:1px solid #314367;border-radius:12px;padding:15px 17px;background:linear-gradient(135deg,#1a2b4b,#111d34);box-shadow:inset 0 1px #ffffff0d}.hero-chip span,.hero-chip small{display:block;color:#8499bc;font-size:10px;letter-spacing:.1em}.hero-chip strong{display:block;margin:8px 0;font-size:18px}.status-banner{display:flex;align-items:center;gap:11px;min-height:42px;background:#13233d;border:1px solid #284267;border-radius:9px;padding:9px 16px;margin-bottom:22px;color:#b8d1fb;font-size:12px}.pulse{width:7px;height:7px;background:#69a7ff;border-radius:50%;box-shadow:0 0 12px #69a7ff}.workspace-grid{display:grid;grid-template-columns:minmax(430px,.93fr) minmax(470px,1.07fr);gap:22px}.panel,.log-panel{border:1px solid #263650;background:#111b2d;border-radius:14px;box-shadow:0 20px 60px #03081730}.panel{padding:27px 28px}.panel-heading{display:flex;justify-content:space-between;align-items:start;border-bottom:1px solid #2a3851;padding-bottom:23px;margin-bottom:22px}.panel-heading h2,.log-heading h2{font-size:22px;margin:7px 0 5px;letter-spacing:-.03em}.panel-heading p{margin:0;color:#8f9db6;font-size:12px}.panel-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:#19345d;color:#78a9ff;font-size:22px}.step{display:flex;gap:15px;margin:22px 0}.step-number{flex:none;display:grid;place-items:center;border:1px solid #43669a;background:#1b3152;color:#9dc2ff;border-radius:8px;width:25px;height:25px;font-weight:800;font-size:11px}.step strong,.send-area>label{font-size:13px}.step p{font-size:12px;color:#9cabc3;line-height:1.7;margin:7px 0 0}.step-content{width:100%}.dropzone{cursor:pointer;border:1px dashed #49658c;background:#14233a;border-radius:10px;min-height:112px;display:flex;align-items:center;justify-content:center;flex-direction:column;margin-top:11px;gap:5px;transition:.15s;text-align:center;padding:10px}.dropzone:hover,.dropzone.dragging{border-color:#76a8ff;background:#1a3152}.dropzone.selected{border-style:solid;border-color:#3e8f8b}.dropzone input{display:none}.dropzone span:not(.upload-glyph){font-weight:700;font-size:13px}.dropzone small{font-size:11px;color:#8a9bb7;max-width:100%;overflow-wrap:anywhere}.upload-glyph{font-size:25px;color:#75a7f9;line-height:1}.field-grid{display:grid;grid-template-columns:130px 1fr;gap:12px;margin-top:12px}.field-grid label,.monitor-toolbar label{font-size:11px;color:#9eacc4;display:flex;flex-direction:column;gap:7px}.hint{color:#637b9e;font-size:10px}input[type=text],select,textarea{background:#0b1526;border:1px solid #344463;border-radius:8px;color:#eaf0fb;font:12px inherit;padding:11px;outline:none;min-width:0}input[type=text]:focus,select:focus,textarea:focus{border-color:#6c9fff;box-shadow:0 0 0 2px #3371ef33}.field-grid input{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:10px;width:100%}.fineprint{font-size:11px;color:#7d8da8;line-height:1.6;margin:9px 0}.flash-footer{border-top:1px solid #2a3851;margin-top:24px;padding-top:20px}.progress-meta{display:flex;justify-content:space-between;color:#a6b5ce;font-size:11px}.progress-meta strong{color:#9dc1ff}progress{display:block;width:100%;height:8px;margin:11px 0 22px;appearance:none;border:0;background:#263752;border-radius:10px;overflow:hidden}progress::-webkit-progress-bar{background:#263752}progress::-webkit-progress-value{background:#4e90ff;border-radius:10px}progress::-moz-progress-bar{background:#4e90ff}.button-row{display:flex;gap:11px}.button-wide{flex:1}.monitor-toolbar{display:flex;align-items:end;justify-content:space-between;gap:15px;margin-bottom:18px}.monitor-toolbar label{min-width:145px}.counters{display:flex;gap:15px;color:#869ab8;font:11px ui-monospace,Consolas,monospace}.counters b{color:#d9e6ff}.terminal-head{background:#0b1424;border:1px solid #2c3b54;border-bottom:0;border-radius:9px 9px 0 0;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font:10px ui-monospace,Consolas,monospace;letter-spacing:.12em;color:#9aacc7}.terminal-head i{display:inline-block;width:6px;height:6px;background:#53d9a0;border-radius:50%;margin-right:7px}.text-button{background:none;border:0;color:#8ba9d8;cursor:pointer;font-size:11px}.text-button:hover{color:#fff}.terminal{height:292px;overflow:auto;margin:0;padding:16px;background:#080f1c;border:1px solid #2c3b54;border-radius:0 0 9px 9px;color:#d4e4ff;font:12px/1.55 ui-monospace,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}.terminal:empty:before{content:'等待串口数据…';color:#5e708d}.monitor-options,.send-options{display:flex;gap:17px;align-items:center;color:#91a1bc;font-size:11px}.monitor-options{margin:13px 0 24px}.monitor-options label,.send-options label{display:flex;gap:5px;align-items:center}input[type=checkbox]{accent-color:#4d8dfa}.send-area{border-top:1px solid #2a3851;padding-top:20px}.send-row{display:flex;align-items:stretch;gap:10px;margin:11px 0}.send-row textarea{resize:vertical;flex:1;min-height:57px}.send-row .button{min-width:88px}.send-options select{padding:5px 7px;font-size:11px}.log-panel{margin-top:22px;padding:22px 28px}.log-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}.log-heading h2{font-size:18px}.log-list{max-height:220px;min-height:78px;overflow:auto;border-top:1px solid #25344c;padding-top:8px}.log-row{display:flex;gap:15px;padding:5px 0;font:11px/1.45 ui-monospace,Consolas,monospace;color:#9aaccc}.log-row time{color:#5f7497;white-space:nowrap}.log-row.success span{color:#6fdbb0}.log-row.error span{color:#ff858e}.log-row.tx span{color:#8cb7ff}footer{display:flex;justify-content:space-between;gap:15px;color:#60718c;font-size:10px;padding:25px 2px 35px}@media(max-width:1000px){.workspace-grid{grid-template-columns:1fr}.hero-chip{display:none}}@media(max-width:650px){.shell{padding:0 16px}.topbar{height:auto;padding:15px 0;align-items:start;gap:15px;flex-direction:column}.top-actions{width:100%;flex-wrap:wrap}.hero{padding:34px 0 25px}.hero h1{font-size:31px}.panel{padding:22px 18px}.workspace-grid{gap:16px}.field-grid{grid-template-columns:1fr}.log-panel{padding:20px 18px}footer{flex-direction:column}}
+.monitor-content-grid{display:grid;grid-template-columns:minmax(0,1fr) 245px;gap:15px}.terminal-column{min-width:0}.pid-panel{min-width:0;background:#0d1728;border:1px solid #2c3b54;border-radius:9px;padding:14px}.pid-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}.pid-heading h3{font-size:14px;margin:0}.pid-values{display:grid;gap:8px;margin:13px 0}.pid-values>div{border:1px solid #2b3c56;border-radius:7px;padding:9px;background:#111f35}.pid-values strong,.pid-values span{display:block}.pid-values strong{font-size:10px;color:#93abd0}.pid-values span{font:11px/1.5 ui-monospace,Consolas,monospace;color:#e7f0ff;margin-top:5px}.pid-inputs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.pid-inputs label{font-size:10px;color:#9eacc4}.pid-inputs input{display:block;width:100%;min-width:0;margin-top:5px;padding:8px 5px;background:#0b1526;border:1px solid #344463;border-radius:7px;color:#eaf0fb;font:11px ui-monospace,Consolas,monospace}.pid-inputs input:focus{outline:1px solid #6c9fff}.pid-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px}.pid-actions .button{font-size:11px;padding:9px 5px}.pid-actions .button:last-child{grid-column:1/-1}.pid-message{display:block;color:#8fb7fa;font-size:11px;margin-top:9px}@media(max-width:1280px){.monitor-content-grid{grid-template-columns:1fr}.pid-panel{max-width:none}}
+.scope-panel{margin-top:22px;padding:25px 28px;border:1px solid #2a4860;border-radius:14px;background:linear-gradient(145deg,#101d2d,#0d1726);box-shadow:0 20px 60px #03081730}.scope-heading{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:18px}.scope-heading h2{font-size:22px;margin:6px 0 3px}.scope-heading p{font-size:12px;color:#8aa3b6;margin:0}.scope-controls{display:flex;align-items:end;gap:9px;flex-wrap:wrap}.scope-controls label{font-size:10px;color:#8fa9be;display:flex;flex-direction:column;gap:4px}.scope-controls select{padding:8px 10px;min-width:92px}.scope-controls .button{padding:9px 13px}.scope-state{font:11px ui-monospace,Consolas,monospace;color:#9bb2c4;padding:9px 12px;border:1px solid #36516a;border-radius:7px;white-space:nowrap}.scope-state.live{color:#5fe3bf;border-color:#2a806e;background:#0d302d}.scope-state.paused{color:#ffce80;border-color:#806044;background:#35291c}.scope-state.missing{color:#ff9f9f;border-color:#85505a;background:#321c27}.scope-readouts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin-bottom:14px}.scope-readouts>div{padding:12px 13px;background:#0a1624;border:1px solid #294057;border-radius:8px}.scope-readouts span,.scope-readouts strong{display:block}.scope-readouts span{font-size:10px;color:#88a2b8}.scope-readouts strong{font:600 19px ui-monospace,Consolas,monospace;color:#d7fff2;margin-top:6px;white-space:nowrap}.scope-screen{height:300px;border:1px solid #35536b;border-radius:9px;overflow:hidden;background:#07101e}.scope-screen canvas{display:block;width:100%;height:100%}.scope-foot{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;color:#829ab0;font-size:10px;margin-top:12px}.scope-foot label{display:flex;align-items:center;gap:6px;color:#a4bad1}@media(max-width:900px){.scope-heading{align-items:start;flex-direction:column}.scope-readouts{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:650px){.scope-panel{padding:20px 16px}.scope-readouts{grid-template-columns:repeat(2,minmax(0,1fr))}.scope-screen{height:250px}.scope-foot{align-items:start;flex-direction:column}}
+
+</style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">M0</span><div><strong>MSPM0 STUDIO</strong><small>本地串口烧录与监视器</small></div></div>
+      <div class="top-actions"><span class="port-pill"><span class="status-dot" id="statusDot"></span><span id="portLabel">未连接</span></span><button id="connectBtn" class="button button-primary">连接串口</button><button id="disconnectBtn" class="button button-quiet" disabled>断开</button></div>
+    </header>
+
+    <main>
+      <div class="hero"><div><div class="eyebrow">MSPM0G3507 · UART BSL</div><h1>固件烧录，一目了然。</h1><p>选择 Intel HEX 固件，进入 BSL 模式后写入；在同一页面查看应用串口输出并发送指令。</p></div><div class="hero-chip"><span>目标芯片</span><strong>MSPM0G3507</strong><small>128 KB MAIN FLASH</small></div></div>
+      <div class="status-banner"><span class="pulse"></span><span id="statusText" role="status" aria-live="polite">准备就绪，选择固件或连接串口</span></div>
+
+      <div class="workspace-grid">
+        <section class="panel flash-panel" aria-labelledby="flashTitle">
+          <div class="panel-heading"><div><span class="section-index">01 / FLASH</span><h2 id="flashTitle">固件烧录</h2><p>通过 ROM BSL 写入主 Flash</p></div><span class="panel-icon">↓</span></div>
+          <div class="step"><span class="step-number">1</span><div><strong>进入 BSL 模式</strong><p>按住 BSL 键 → 按 RST → 松开 RST → 松开 BSL。<br>进入后请在 10 秒内开始烧录。</p></div></div>
+          <div class="step"><span class="step-number">2</span><div class="step-content"><strong>选择固件</strong><label class="dropzone" id="dropzone" for="fileInput"><input id="fileInput" type="file" accept=".hex,.ihex,text/plain"><span class="upload-glyph">⌁</span><span id="fileName">选择 Intel HEX 固件</span><small id="fileDetails">点击选择或拖放 .hex 文件</small></label></div></div>
+          <div class="step"><span class="step-number">3</span><div class="step-content"><strong>烧录设置</strong><div class="field-grid"><label>BSL 波特率<select id="flashBaud"><option>9600</option><option>19200</option><option>38400</option><option>57600</option><option selected>115200</option><option>4800</option><option>1000000</option></select></label><label>BSL 密码 <span class="hint">出厂默认全 FF</span><input id="password" type="text" value="FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF" spellcheck="false" autocomplete="off" aria-label="32 字节 BSL 密码，64 位十六进制"></label></div><p class="fineprint">先以 9600 bps 连接 BSL，再切换到所选速率。仅支持芯片主 Flash 地址 0x00000–0x1FFFF。</p></div></div>
+          <div class="flash-footer"><div class="progress-meta"><span>烧录进度</span><strong id="progressLabel">0%</strong></div><progress id="progress" max="100" value="0"></progress><div class="button-row"><button id="flashBtn" class="button button-primary button-wide" disabled>开始烧录</button><button id="startBtn" class="button button-outline" disabled>启动应用</button></div><p class="fineprint">烧录将擦除主 Flash；每块写入均检查芯片返回的执行结果。不会更改 Non-main 配置区。</p></div>
+        </section>
+
+        <section class="panel monitor-panel" aria-labelledby="monitorTitle">
+          <div class="panel-heading"><div><span class="section-index">02 / SERIAL MONITOR</span><h2 id="monitorTitle">串口监视器</h2><p>实时收发应用数据</p></div><span class="panel-icon">↔</span></div>
+          <div class="monitor-toolbar"><label>监视器波特率<select id="monitorBaud"><option>1200</option><option>2400</option><option>4800</option><option>9600</option><option>19200</option><option>38400</option><option>57600</option><option selected>115200</option><option>230400</option><option>460800</option><option>921600</option></select></label><div class="counters"><span>RX <b id="rxCount">0</b> B</span><span>TX <b id="txCount">0</b> B</span></div></div>
+          <div class="monitor-content-grid"><div class="terminal-column">
+          <div class="terminal-head"><span><i></i> SERIAL OUTPUT</span><button id="clearMonitor" class="text-button">清空</button></div>
+          <pre id="monitorOutput" class="terminal" aria-label="串口接收内容"></pre>
+          </div><section class="pid-panel" aria-labelledby="pidTitle">
+            <div class="pid-heading"><h3 id="pidTitle">PID 参数</h3><button id="pidReadBtn" class="text-button" disabled>读取</button></div>
+            <div class="pid-values"><div><strong>RAM · 当前运行</strong><span id="pidRam">待读取</span></div><div><strong>FLASH · 已保存</strong><span id="pidFlash">待读取</span></div></div>
+            <div class="pid-inputs"><label>Kp<input id="pidKp" type="number" min="0" max="100000" step="1" value="4000"></label><label>Ki<input id="pidKi" type="number" min="0" max="100000" step="1" value="1500"></label><label>Kd<input id="pidKd" type="number" min="0" max="100000" step="1" value="0"></label></div>
+            <div class="pid-actions"><button id="pidApplyBtn" class="button button-primary" disabled>应用到 RAM</button><button id="pidSaveBtn" class="button button-outline" disabled>保存到 FLASH</button><button id="pidLoadBtn" class="button button-quiet" disabled>从 FLASH 载入</button></div>
+            <p class="fineprint">应用后立即生效；保存会让电机停止，并写入 Flash。烧录新固件会擦除已保存参数。</p>
+            <span id="pidMessage" class="pid-message" role="status" aria-live="polite">连接后自动读取参数</span>
+          </section></div>
+          <div class="monitor-options"><label><input id="rxHex" type="checkbox"> HEX 显示</label><label><input id="autoScroll" type="checkbox" checked> 自动滚动</label></div>
+          <div class="send-area"><label for="sendInput">发送数据</label><div class="send-row"><textarea id="sendInput" rows="2" placeholder="输入要发送的内容；Enter 发送，Shift+Enter 换行"></textarea><button id="sendBtn" class="button button-primary" disabled>发送 ↗</button></div><div class="send-options"><label><input id="sendHex" type="checkbox"> HEX 发送</label><label><input id="keepInput" type="checkbox"> 保留输入</label><label>行尾<select id="lineEnding"><option value="none">无</option><option value="lf">LF</option><option value="cr">CR</option><option value="crlf" selected>CRLF</option></select></label></div></div>
+        </section>
+      </div>
+
+      <section class="scope-panel" aria-labelledby="scopeTitle">
+        <div class="scope-heading"><div><span class="section-index">03 / PA28 INPUT</span><h2 id="scopeTitle">舵机信号波形</h2><p>逐脉冲边沿计时 · 数字波形重建</p></div><div class="scope-controls"><span id="scopeState" class="scope-state">等待信号</span><label>时间窗<select id="scopeWindow"><option value="20000">20 ms</option><option value="50000">50 ms</option><option value="100000" selected>100 ms</option><option value="200000">200 ms</option></select></label><button id="scopePause" class="button button-outline">暂停</button><button id="scopeClear" class="button button-quiet">清除</button></div></div>
+        <div class="scope-readouts"><div><span>高电平</span><strong id="scopeHigh">—</strong></div><div><span>低电平</span><strong id="scopeLow">—</strong></div><div><span>周期</span><strong id="scopePeriod">—</strong></div><div><span>频率</span><strong id="scopeFrequency">—</strong></div><div><span>收到 / 丢帧</span><strong id="scopeSamples">0 / 0</strong></div></div>
+        <div class="scope-screen"><canvas id="scopeCanvas" aria-label="PA28 数字输入波形，高低电平随时间变化"></canvas></div>
+        <div class="scope-foot"><span>PA28 · 接收器信号与开发板共地 · 115200 bps</span><label><input id="showWaveRaw" type="checkbox"> 在串口窗口显示逐脉冲数据</label><span>按实际捕获的每周期高电平与周期重建；不显示模拟电压或毛刺形状</span></div>
+      </section>
+
+      <section class="log-panel" aria-labelledby="logTitle"><div class="log-heading"><div><span class="section-index">04 / ACTIVITY</span><h2 id="logTitle">操作日志</h2></div><button id="clearLog" class="text-button">清空日志</button></div><div id="log" class="log-list" aria-live="polite"></div></section>
+      <footer>本地运行 · Web Serial · 8N1 <span>USB 转串口接线：TX → PA11 (BSL_RX)，RX → PA10 (BSL_TX)，共地</span></footer>
+    </main>
+  </div>
+  <script>
+(() => {
+'use strict';
+const FLASH_SIZE = 0x20000; // MSPM0G3507 Main Flash: 128 KiB
+
+function parseHex(text) {
+  const bytes = new Map();
+  let base = 0;
+  let ended = false;
+  const lines = text.replace(/^\uFEFF/, '').split(/\r?\n/);
+  for (let n = 0; n < lines.length; n++) {
+    const line = lines[n].trim();
+    if (!line) continue;
+    if (ended) throw new Error(`第 ${n + 1} 行：结束记录后还有数据`);
+    if (!/^:[0-9a-fA-F]+$/.test(line) || (line.length - 1) % 2) throw new Error(`第 ${n + 1} 行：不是有效 Intel HEX 记录`);
+    const record = Uint8Array.from(line.slice(1).match(/../g).map(x => parseInt(x, 16)));
+    const count = record[0];
+    if (record.length !== count + 5) throw new Error(`第 ${n + 1} 行：记录长度不符`);
+    if ((record.reduce((a, b) => a + b, 0) & 255) !== 0) throw new Error(`第 ${n + 1} 行：校验和错误`);
+    const offset = (record[1] << 8) | record[2];
+    const type = record[3];
+    const data = record.slice(4, 4 + count);
+    if (type === 0) {
+      const start = base + offset;
+      if (start < 0 || start + count > FLASH_SIZE) throw new Error(`第 ${n + 1} 行：地址超出 MSPM0G3507 主 Flash (0x00000–0x1FFFF)`);
+      for (let i = 0; i < data.length; i++) {
+        const address = start + i;
+        if (bytes.has(address) && bytes.get(address) !== data[i]) throw new Error(`第 ${n + 1} 行：地址 0x${address.toString(16)} 有冲突数据`);
+        bytes.set(address, data[i]);
+      }
+    } else if (type === 1) {
+      if (count !== 0) throw new Error(`第 ${n + 1} 行：结束记录格式错误`);
+      ended = true;
+    } else if (type === 2) {
+      if (count !== 2) throw new Error(`第 ${n + 1} 行：段地址格式错误`);
+      base = ((data[0] << 8) | data[1]) * 16;
+    } else if (type === 4) {
+      if (count !== 2) throw new Error(`第 ${n + 1} 行：线性地址格式错误`);
+      base = (((data[0] << 8) | data[1]) * 0x10000);
+    } else if (type !== 3 && type !== 5) {
+      throw new Error(`第 ${n + 1} 行：不支持的记录类型 ${type}`);
+    }
+  }
+  if (!ended) throw new Error('HEX 缺少结束记录');
+  if (!bytes.size) throw new Error('HEX 不含可烧录数据');
+
+  // Group occupied 8-byte words. Unspecified bytes within a word retain erased value FF.
+  const words = [...new Set([...bytes.keys()].map(address => address & ~7))].sort((a, b) => a - b);
+  const segments = [];
+  let start = words[0], previous = words[0];
+  for (const word of words.slice(1)) {
+    if (word !== previous + 8) {
+      segments.push(makeSegment(start, previous + 8, bytes));
+      start = word;
+    }
+    previous = word;
+  }
+  segments.push(makeSegment(start, previous + 8, bytes));
+  return { segments, sourceBytes: bytes.size, programmedBytes: segments.reduce((n, s) => n + s.data.length, 0), first: words[0], last: words.at(-1) + 7 };
+}
+
+function makeSegment(start, end, bytes) {
+  const data = new Uint8Array(end - start).fill(0xff);
+  for (let address = start; address < end; address++) if (bytes.has(address)) data[address - start] = bytes.get(address);
+  return { address: start, data };
+}
+
+function* chunks(image, maxData = 256) {
+  const size = Math.floor(maxData / 8) * 8;
+  if (size < 8) throw new Error('BSL 缓冲区不足以写入 8 字节');
+  for (const segment of image.segments) {
+    for (let i = 0; i < segment.data.length; i += size) {
+      yield { address: segment.address + i, data: segment.data.slice(i, i + size) };
+    }
+  }
+}
+
+const BSL_BAUD = new Map([[4800, 1], [9600, 2], [19200, 3], [38400, 4], [57600, 5], [115200, 6], [1000000, 7], [2000000, 8], [3000000, 9]]);
+const coreErrors = ['成功', 'BSL 已锁定', '密码错误', '多次密码错误', '未知命令', '无效内存范围', '无效命令', '禁止出厂重置', '出厂重置密码错误', '禁止读出', '地址或长度未按 8 字节对齐', '验证长度小于 1 KB'];
+const ackErrors = { 0x51: '帧头错误', 0x52: 'CRC 错误', 0x53: '数据长度为零', 0x54: '数据包太大', 0x55: '未知通信错误', 0x56: '不支持此波特率' };
+
+// TI BSL uses reflected CRC-32 with seed FFFFFFFF and no final XOR.
+function crc32(data) {
+  let crc = 0xffffffff;
+  for (const byte of data) {
+    crc ^= byte;
+    for (let i = 0; i < 8; i++) crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0);
+  }
+  return crc >>> 0;
+}
+function le32(value) { return [value & 255, value >>> 8 & 255, value >>> 16 & 255, value >>> 24 & 255]; }
+function packet(command, data = []) {
+  const core = Uint8Array.of(command, ...data);
+  return Uint8Array.of(0x80, core.length & 255, core.length >>> 8, ...core, ...le32(crc32(core)));
+}
+function parseResponse(frame) {
+  if (frame[0] !== 0x08) throw new Error('BSL 响应帧头错误');
+  const len = frame[1] | frame[2] << 8;
+  if (len < 1 || frame.length !== len + 7) throw new Error('BSL 响应长度错误');
+  const core = frame.slice(3, 3 + len);
+  const expected = le32(crc32(core));
+  if (expected.some((b, i) => b !== frame[3 + len + i])) throw new Error('BSL 响应 CRC 错误');
+  return { id: core[0], data: core.slice(1) };
+}
+class Bsl {
+  constructor(serial, log = () => {}) { this.serial = serial; this.log = log; }
+  async command(id, data = [], response = null, timeout = 2500) {
+    await this.serial.write(packet(id, data));
+    const ack = (await this.serial.readExact(1, timeout))[0];
+    if (ack !== 0) throw new Error(`BSL 拒绝命令 0x${id.toString(16)}：${ackErrors[ack] || `ACK 0x${ack.toString(16)}`}`);
+    if (response === null) return null;
+    const header = await this.serial.readExact(3, timeout);
+    if (header[0] !== 0x08) throw new Error(`BSL 响应帧头错误：0x${header[0].toString(16)}`);
+    const len = header[1] | header[2] << 8;
+    if (len < 1 || len > 8192) throw new Error(`BSL 响应长度异常：${len}`);
+    const frame = Uint8Array.of(...header, ...await this.serial.readExact(len + 4, timeout));
+    const parsed = parseResponse(frame);
+    if (parsed.id === 0x3b) {
+      const status = parsed.data[0];
+      if (status !== 0) throw new Error(`BSL 执行失败：${coreErrors[status] || `状态 0x${status.toString(16)}`}`);
+      if (response !== 0x3b) throw new Error('BSL 返回了状态消息，未返回预期数据');
+    } else if (parsed.id === 0x3a) {
+      throw new Error(`BSL Flash 详细错误：${[...parsed.data].map(x => x.toString(16).padStart(2, '0')).join(' ')}`);
+    } else if (parsed.id !== response) {
+      throw new Error(`BSL 返回类型 0x${parsed.id.toString(16)}，预期 0x${response.toString(16)}`);
+    }
+    return parsed.data;
+  }
+  async connect() { await this.command(0x12); this.log('BSL 已连接'); }
+  async info() {
+    const data = await this.command(0x19, [], 0x31);
+    if (data.length !== 24) throw new Error('BSL 设备信息长度不符');
+    const maxBuffer = data[10] | data[11] << 8;
+    if (maxBuffer < 32) throw new Error('BSL 报告的缓冲区过小');
+    return { maxBuffer, interpreter: data[0] | data[1] << 8 };
+  }
+  async setBaud(rate) {
+    if (!BSL_BAUD.has(rate)) throw new Error('BSL 不支持所选波特率');
+    if (rate !== 9600) await this.command(0x52, [BSL_BAUD.get(rate)]);
+  }
+  async unlock(password) {
+    if (password.length !== 32) throw new Error('BSL 密码必须为 32 字节');
+    await this.command(0x21, password, 0x3b);
+  }
+  async erase() { await this.command(0x15, [], 0x3b, 15000); }
+  async program(address, data) {
+    if (address % 8 || data.length % 8) throw new Error('写入地址和长度须为 8 字节倍数');
+    await this.command(0x20, [...le32(address), ...data], 0x3b, 5000);
+  }
+  async start() { await this.command(0x40); }
+}
+
+class SerialConnection {
+  constructor(onData, onClose) {
+    this.onData = onData;
+    this.onClose = onClose;
+    this.port = null;
+    this.reader = null;
+    this.mode = 'monitor';
+    this.queue = [];
+    this.waiter = null;
+    this.closing = false;
+  }
+  get isOpen() { return !!this.port?.readable; }
+  async choosePort() {
+    if (!('serial' in navigator)) throw new Error('此浏览器不支持 Web Serial，请使用桌面版 Chrome 或 Edge');
+    if (!window.isSecureContext) throw new Error('请直接打开本地 HTML，或通过 http://127.0.0.1 打开本工具');
+    if (!this.port) {
+      try { this.port = await navigator.serial.requestPort(); }
+      catch (error) {
+        if (error?.name === 'NotFoundError') throw new Error('未选择串口。请在设备列表中选择 USB 串口（如 CH340），并确认设备已连接电脑');
+        if (error?.name === 'SecurityError' && window.location?.protocol === 'file:') throw new Error('浏览器拒绝本地文件的串口权限。请双击 start-local.cmd，通过 127.0.0.1 打开工具');
+        throw error;
+      }
+    }
+    return this.port;
+  }
+  async open(baudRate) {
+    if (!this.port) throw new Error('尚未选择串口');
+    if (this.isOpen) await this.close();
+    this.closing = false;
+    this.queue = [];
+    await this.port.open({ baudRate, dataBits: 8, stopBits: 1, parity: 'none', flowControl: 'none' });
+    this.readTask = this.readLoop();
+  }
+  async readLoop() {
+    let readError = null;
+    try {
+      while (this.port.readable && !this.closing) {
+        this.reader = this.port.readable.getReader();
+        try {
+          while (true) {
+            const { value, done } = await this.reader.read();
+            if (done) break;
+            if (value?.length) {
+              if (this.mode === 'bsl') {
+                this.queue.push(...value);
+                this.flushWaiter();
+              } else this.onData(value);
+            }
+          }
+        } finally { this.reader.releaseLock(); this.reader = null; }
+      }
+    } catch (error) {
+      readError = error;
+    } finally {
+      if (!this.closing) {
+        this.rejectWaiter(new Error('串口连接已断开'));
+        this.onClose(readError || new Error('设备已断开'));
+      }
+    }
+  }
+  setMode(mode) {
+    this.mode = mode;
+    this.queue = [];
+    if (mode === 'monitor') this.rejectWaiter(new Error('已退出 BSL 模式'));
+  }
+  flushWaiter() {
+    if (this.waiter && this.queue.length >= this.waiter.count) {
+      const { count, resolve, timer } = this.waiter;
+      clearTimeout(timer);
+      this.waiter = null;
+      resolve(Uint8Array.from(this.queue.splice(0, count)));
+    }
+  }
+  rejectWaiter(error) {
+    if (this.waiter) {
+      clearTimeout(this.waiter.timer);
+      this.waiter.reject(error);
+      this.waiter = null;
+    }
+  }
+  readExact(count, timeout = 2500) {
+    if (!this.isOpen) return Promise.reject(new Error('串口未连接'));
+    if (this.waiter) return Promise.reject(new Error('串口读取已在进行中'));
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        this.waiter = null;
+        reject(new Error('等待芯片响应超时，请检查 BSL 模式、接线和波特率'));
+      }, timeout);
+      this.waiter = { count, resolve, reject, timer };
+      this.flushWaiter();
+    });
+  }
+  async write(data) {
+    if (!this.port?.writable) throw new Error('串口未连接');
+    const writer = this.port.writable.getWriter();
+    try { await writer.write(data); } finally { writer.releaseLock(); }
+  }
+  async close() {
+    this.closing = true;
+    this.rejectWaiter(new Error('串口已关闭'));
+    try { await this.reader?.cancel(); } catch {}
+    await this.readTask;
+    if (this.port?.readable || this.port?.writable) await this.port.close();
+    this.queue = [];
+  }
+}
+
+function parseWaveLine(line) {
+  const match = /^RCW (\d+) (\d+) (\d+)$/.exec(line.trim());
+  if (!match) return null;
+  const sequence = Number(match[1]);
+  const highUs = Number(match[2]);
+  const periodUs = Number(match[3]);
+  if (!Number.isSafeInteger(sequence) || !Number.isSafeInteger(highUs) ||
+      !Number.isSafeInteger(periodUs) || periodUs < 1 || periodUs > 65535 ||
+      highUs > periodUs) return null;
+  return { sequence, highUs, periodUs };
+}
+
+function waveformSegments(samples, windowUs) {
+  const selected = [];
+  let duration = 0;
+  for (let i = samples.length - 1; i >= 0 && duration < windowUs; i--) {
+    selected.unshift(samples[i]);
+    duration += samples[i].periodUs;
+  }
+  let start = -duration;
+  return selected.map(sample => {
+    const segment = {
+      start, highEnd: start + sample.highUs,
+      end: start + sample.periodUs, gapBefore: !!sample.gapBefore,
+    };
+    start = segment.end;
+    return segment;
+  });
+}
+
+class PulseScope {
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.samples = [];
+    this.windowUs = 100000;
+    this.lastSequence = null;
+    this.received = 0;
+    this.dropped = 0;
+    this.paused = false;
+    this.framePending = false;
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver(() => this.schedule());
+      this.resizeObserver.observe(canvas);
+    }
+    this.schedule();
+  }
+  push(sample) {
+    if (this.paused) return;
+    if (this.lastSequence !== null && sample.sequence <= this.lastSequence) this.clear();
+    const gapBefore = this.lastSequence !== null && sample.sequence > this.lastSequence + 1;
+    if (gapBefore) this.dropped += sample.sequence - this.lastSequence - 1;
+    this.lastSequence = sample.sequence;
+    this.received++;
+    this.samples.push({ ...sample, gapBefore });
+    if (this.samples.length > 512) this.samples.splice(0, this.samples.length - 512);
+    this.schedule();
+  }
+  clear() {
+    this.samples = [];
+    this.lastSequence = null;
+    this.received = 0;
+    this.dropped = 0;
+    this.schedule();
+  }
+  setWindow(windowUs) {
+    this.windowUs = windowUs;
+    this.schedule();
+  }
+  schedule() {
+    if (this.framePending || !this.ctx) return;
+    this.framePending = true;
+    const requestFrame = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : callback => setTimeout(callback, 0);
+    requestFrame(() => { this.framePending = false; this.draw(); });
+  }
+  draw() {
+    const canvas = this.canvas;
+    const ctx = this.ctx;
+    const width = Math.max(canvas.clientWidth || 800, 320);
+    const height = Math.max(canvas.clientHeight || 260, 180);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = '#07101e';
+    ctx.fillRect(0, 0, width, height);
+    const left = 56;
+    const right = width - 20;
+    const top = 30;
+    const bottom = height - 34;
+    const highY = top + (bottom - top) * 0.23;
+    const lowY = top + (bottom - top) * 0.78;
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#233b50';
+    for (let i = 0; i <= 10; i++) {
+      const x = left + (right - left) * i / 10;
+      ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke();
+    }
+    for (let i = 0; i <= 4; i++) {
+      const y = top + (bottom - top) * i / 4;
+      ctx.beginPath(); ctx.moveTo(left, y); ctx.lineTo(right, y); ctx.stroke();
+    }
+    ctx.fillStyle = '#809ab0';
+    ctx.font = '11px ui-monospace, Consolas, monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText('HIGH', left - 9, highY + 4);
+    ctx.fillText('LOW', left - 9, lowY + 4);
+    ctx.textAlign = 'center';
+    for (let i = 0; i <= 10; i += 2) {
+      const x = left + (right - left) * i / 10;
+      ctx.fillText(`${Math.round((i / 10 - 1) * this.windowUs / 1000)} ms`, x, height - 11);
+    }
+    const segments = waveformSegments(this.samples, this.windowUs);
+    const scale = (right - left) / this.windowUs;
+    ctx.save();
+    ctx.beginPath(); ctx.rect(left, top, right - left, bottom - top); ctx.clip();
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = '#49e1c2';
+    ctx.shadowColor = '#49e1c2';
+    ctx.shadowBlur = 9;
+    ctx.beginPath();
+    for (const segment of segments) {
+      const startX = right + segment.start * scale;
+      const highX = right + segment.highEnd * scale;
+      const endX = right + segment.end * scale;
+      ctx.moveTo(startX, lowY);
+      ctx.lineTo(startX, highY);
+      ctx.lineTo(highX, highY);
+      ctx.lineTo(highX, lowY);
+      ctx.lineTo(endX, lowY);
+    }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = '#ffad6b';
+    ctx.lineWidth = 1.5;
+    for (const segment of segments) {
+      if (!segment.gapBefore) continue;
+      const x = right + segment.start * scale;
+      ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke();
+    }
+    ctx.restore();
+    if (!segments.length) {
+      ctx.fillStyle = '#678097';
+      ctx.textAlign = 'center';
+      ctx.font = '13px system-ui, sans-serif';
+      ctx.fillText('连接串口并输入 PA28 信号后显示波形', (left + right) / 2, (top + bottom) / 2);
+    }
+  }
+}
+
+
+
+
+
+const $ = id => document.getElementById(id);
+const serial = new SerialConnection(showIncoming, error => { setStatus(`串口断开：${error.message}`, 'error'); setScopeState('串口已断开'); updateButtons(); });
+const scope = typeof $('scopeCanvas').getContext === 'function' ? new PulseScope($('scopeCanvas')) : null;
+let image = null;
+let busy = false;
+let textDecoder = new TextDecoder();
+let monitorLineBuffer = '';
+let monitorPendingShown = 0;
+let pidSupported = false;
+let pendingPidCommand = '';
+let logLines = 0;
+const hex = value => `0x${value.toString(16).toUpperCase().padStart(5, '0')}`;
+
+function log(message, kind = 'info') {
+  const row = document.createElement('div');
+  row.className = `log-row ${kind}`;
+  const time = document.createElement('time');
+  time.textContent = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+  const text = document.createElement('span');
+  text.textContent = message;
+  row.append(time, text);
+  $('log').append(row);
+  if (++logLines > 500) { $('log').firstElementChild.remove(); logLines--; }
+  $('log').scrollTop = $('log').scrollHeight;
+}
+function setStatus(message, kind = 'info') {
+  $('statusText').textContent = message;
+  $('statusDot').className = `status-dot ${kind}`;
+  log(message, kind);
+}
+function updateButtons() {
+  $('connectBtn').disabled = busy || serial.isOpen;
+  $('disconnectBtn').disabled = busy || !serial.isOpen;
+  $('flashBtn').disabled = busy || !image;
+  $('startBtn').disabled = busy || !serial.isOpen;
+  $('sendBtn').disabled = busy || !serial.isOpen || serial.mode !== 'monitor';
+  for (const id of ['pidReadBtn', 'pidApplyBtn'])
+    $(id).disabled = busy || !serial.isOpen || serial.mode !== 'monitor';
+  for (const id of ['pidSaveBtn', 'pidLoadBtn'])
+    $(id).disabled = busy || !serial.isOpen || serial.mode !== 'monitor' || !pidSupported;
+  $('monitorBaud').disabled = busy || serial.isOpen;
+  $('flashBaud').disabled = busy;
+  $('fileInput').disabled = busy;
+  $('portLabel').textContent = serial.isOpen ? `已连接 · ${serial.mode === 'bsl' ? 'BSL' : '监视器'}` : '未连接';
+}
+function showIncoming(data) {
+  const output = $('monitorOutput');
+  const incoming = textDecoder.decode(data, { stream: true });
+  monitorLineBuffer += incoming;
+  const lines = monitorLineBuffer.split('\n');
+  monitorLineBuffer = lines.pop();
+  let visible = '';
+  for (const line of lines) {
+    const clean = line.trim();
+    handlePidLine(clean);
+    const isWaveLine = handleWaveLine(clean);
+    if (!isWaveLine || $('showWaveRaw').checked) visible += `${line}\n`.slice(monitorPendingShown);
+    monitorPendingShown = 0;
+  }
+  if (monitorLineBuffer.length > 4096) {
+    visible += monitorLineBuffer.slice(monitorPendingShown);
+    monitorLineBuffer = '';
+    monitorPendingShown = 0;
+  } else if (!$('rxHex').checked &&
+      !(monitorLineBuffer.startsWith('RCW ') || 'RCW '.startsWith(monitorLineBuffer))) {
+    visible += monitorLineBuffer.slice(monitorPendingShown);
+    monitorPendingShown = monitorLineBuffer.length;
+  }
+  const part = $('rxHex').checked ? [...data].map(b => b.toString(16).toUpperCase().padStart(2, '0')).join(' ') + ' ' : visible;
+  if (part) output.textContent += part;
+  if (output.textContent.length > 100000) output.textContent = output.textContent.slice(-80000);
+  if ($('autoScroll').checked) output.scrollTop = output.scrollHeight;
+  $('rxCount').textContent = Number($('rxCount').textContent) + data.length;
+}
+function setScopeState(message, kind = '') {
+  $('scopeState').textContent = message;
+  $('scopeState').className = `scope-state ${kind}`;
+}
+function updateScopeReadouts(sample = null) {
+  $('scopeHigh').textContent = sample ? `${sample.highUs} µs` : '—';
+  $('scopeLow').textContent = sample ? `${sample.periodUs - sample.highUs} µs` : '—';
+  $('scopePeriod').textContent = sample ? `${sample.periodUs} µs` : '—';
+  $('scopeFrequency').textContent = sample ? `${(1000000 / sample.periodUs).toFixed(2)} Hz` : '—';
+  $('scopeSamples').textContent = scope ? `${scope.received} / ${scope.dropped}` : '0 / 0';
+}
+function handleWaveLine(line) {
+  if (line.startsWith('RCW ')) {
+    const sample = parseWaveLine(line);
+    if (!sample) { setScopeState('脉冲数据异常', 'missing'); return true; }
+    if (scope && !scope.paused) {
+      scope.push(sample);
+      updateScopeReadouts(sample);
+      setScopeState('实时采集', 'live');
+    }
+    return true;
+  }
+  if (line === 'RC PA28 NO PULSE' && scope && !scope.paused) setScopeState('PA28 无新脉冲', 'missing');
+  else if (line.startsWith('RC PA28 high=') && scope && scope.received === 0)
+    setScopeState('需要逐脉冲固件', 'missing');
+  return false;
+}
+function handlePidLine(line) {
+  const match = /^PID RAM (\d+) (\d+) (\d+) FLASH (?:(\d+) (\d+) (\d+)|NONE)$/.exec(line);
+  if (match) {
+    pidSupported = true;
+    pendingPidCommand = '';
+    $('pidRam').textContent = `Kp ${match[1]} · Ki ${match[2]} · Kd ${match[3]}`;
+    $('pidFlash').textContent = match[4] === undefined ? '未保存' : `Kp ${match[4]} · Ki ${match[5]} · Kd ${match[6]}`;
+    $('pidMessage').textContent = '参数已更新';
+    updateButtons();
+  } else if (line === 'ERR P' && ['P?', 'PL', 'PS'].includes(pendingPidCommand)) {
+    pidSupported = false;
+    pendingPidCommand = '';
+    $('pidMessage').textContent = '当前固件不支持 Flash 参数命令；请烧录新版 smart_car.hex';
+    updateButtons();
+  } else if (/^(OK|ERR) P(?:S|L|D)?$/.test(line)) {
+    pendingPidCommand = '';
+    $('pidMessage').textContent = line.startsWith('OK') ? `${line} 成功` : `${line} 失败`;
+  }
+}
+async function sendPid(command) {
+  if (busy || !serial.isOpen || serial.mode !== 'monitor') return;
+  try {
+    const data = new TextEncoder().encode(`${command}\n`);
+    pendingPidCommand = command.split(' ')[0];
+    await serial.write(data);
+    $('txCount').textContent = Number($('txCount').textContent) + data.length;
+    if (pendingPidCommand) $('pidMessage').textContent = `已发送 ${command}`;
+    log(`TX ${command}`, 'tx');
+  } catch (error) { setStatus(`PID 指令发送失败：${error.message}`, 'error'); }
+}
+function applyPid() {
+  const values = ['pidKp', 'pidKi', 'pidKd'].map(id => Number($(id).value));
+  if (values.some(value => !Number.isInteger(value) || value < 0 || value > 100000)) {
+    $('pidMessage').textContent = 'Kp、Ki、Kd 须为 0～100000 的整数';
+    return;
+  }
+  return sendPid(`P ${values.join(' ')}`);
+}
+async function loadFile(file) {
+  if (!file) return;
+  try {
+    image = parseHex(await file.text());
+    $('fileName').textContent = file.name;
+    $('fileDetails').textContent = `${image.sourceBytes.toLocaleString()} 字节数据 · ${image.programmedBytes.toLocaleString()} 字节待写入 · ${hex(image.first)}–${hex(image.last)}`;
+    $('dropzone').classList.add('selected');
+    setStatus('HEX 校验通过，准备烧录', 'success');
+  } catch (error) {
+    image = null;
+    $('fileName').textContent = '选择 Intel HEX 固件';
+    $('fileDetails').textContent = error.message;
+    $('dropzone').classList.remove('selected');
+    setStatus(`文件无效：${error.message}`, 'error');
+  }
+  updateButtons();
+}
+async function connectMonitor() {
+  try {
+    pidSupported = false;
+    pendingPidCommand = '';
+    $('pidRam').textContent = '待读取';
+    $('pidFlash').textContent = '待读取';
+    await serial.choosePort();
+    serial.setMode('monitor');
+    await serial.open(Number($('monitorBaud').value));
+    textDecoder = new TextDecoder();
+    monitorLineBuffer = '';
+    monitorPendingShown = 0;
+    if (scope) { scope.paused = false; scope.clear(); }
+    $('scopePause').textContent = '暂停';
+    updateScopeReadouts();
+    setScopeState('等待 PA28 信号');
+    setStatus(`串口已连接，${$('monitorBaud').value} bps`, 'success');
+    await sendPid('P?');
+  } catch (error) { setStatus(`连接失败：${error.message}`, 'error'); }
+  updateButtons();
+}
+async function disconnect() {
+  try { await serial.close(); setStatus('串口已断开'); }
+  catch (error) { setStatus(`断开失败：${error.message}`, 'error'); }
+  pidSupported = false;
+  pendingPidCommand = '';
+  setScopeState('串口已断开');
+  updateButtons();
+}
+function passwordBytes() {
+  const input = $('password').value.replace(/\s+/g, '');
+  if (!/^[0-9a-fA-F]{64}$/.test(input)) throw new Error('BSL 密码须为 64 位十六进制字符（32 字节）');
+  return Uint8Array.from(input.match(/../g).map(x => parseInt(x, 16)));
+}
+async function prepareBsl() {
+  await serial.choosePort();
+  if (serial.isOpen) await serial.close();
+  serial.setMode('bsl');
+  await serial.open(9600);
+  const bsl = new Bsl(serial, message => log(message));
+  await bsl.connect();
+  const info = await bsl.info();
+  log(`芯片 BSL 版本 0x${info.interpreter.toString(16)}，缓冲区 ${info.maxBuffer} 字节`);
+  const baud = Number($('flashBaud').value);
+  if (baud !== 9600) {
+    await bsl.setBaud(baud);
+    await serial.close();
+    await serial.open(baud);
+    log(`BSL 已切换到 ${baud} bps`);
+  }
+  await bsl.unlock(passwordBytes());
+  log('BSL 解锁成功');
+  return { bsl, info };
+}
+async function flash() {
+  if (!image || busy) return;
+  busy = true;
+  updateButtons();
+  $('progress').value = 0;
+  $('progressLabel').textContent = '0%';
+  try {
+    // requestPort is reached directly from the click handler, retaining browser user activation.
+    const { bsl, info } = await prepareBsl();
+    setStatus('正在擦除主 Flash…');
+    await bsl.erase();
+    log('主 Flash 擦除成功');
+    const blocks = [...chunks(image, Math.min(256, info.maxBuffer - 12))];
+    for (let i = 0; i < blocks.length; i++) {
+      await bsl.program(blocks[i].address, blocks[i].data);
+      const percent = Math.round((i + 1) / blocks.length * 100);
+      $('progress').value = percent;
+      $('progressLabel').textContent = `${percent}%`;
+      if (i === 0 || i === blocks.length - 1 || i % 16 === 15) log(`已写入 ${i + 1}/${blocks.length} 块`);
+    }
+    setStatus('烧录完成：所有写入块均收到 BSL 成功回执', 'success');
+    log('可点击“启动应用”，然后用监视器连接应用串口波特率');
+  } catch (error) {
+    setStatus(`烧录失败：${error.message}`, 'error');
+  } finally { busy = false; updateButtons(); }
+}
+async function startApplication() {
+  if (busy) return;
+  busy = true; updateButtons();
+  try {
+    if (serial.mode !== 'bsl') throw new Error('当前串口不在 BSL 模式，请先烧录');
+    await new Bsl(serial).start();
+    await serial.close();
+    serial.setMode('monitor');
+    await serial.open(Number($('monitorBaud').value));
+    textDecoder = new TextDecoder();
+    monitorLineBuffer = '';
+    monitorPendingShown = 0;
+    if (scope) { scope.paused = false; scope.clear(); }
+    $('scopePause').textContent = '暂停';
+    updateScopeReadouts();
+    setScopeState('等待 PA28 信号');
+    pidSupported = false;
+    $('pidRam').textContent = '待读取';
+    $('pidFlash').textContent = '待读取';
+    setStatus(`应用已启动；监视器以 ${$('monitorBaud').value} bps 监听`, 'success');
+  } catch (error) { setStatus(`启动应用失败：${error.message}`, 'error'); }
+  finally { busy = false; updateButtons(); if (serial.isOpen && serial.mode === 'monitor') await sendPid('P?'); }
+}
+async function send() {
+  if (!serial.isOpen || serial.mode !== 'monitor') return;
+  try {
+    const input = $('sendInput').value;
+    let data;
+    if ($('sendHex').checked) {
+      const clean = input.replace(/[\s,]+/g, '');
+      if (!clean || !/^(?:[0-9a-fA-F]{2})+$/.test(clean)) throw new Error('HEX 发送须为成对的十六进制字节');
+      data = Uint8Array.from(clean.match(/../g).map(x => parseInt(x, 16)));
+    } else {
+      const ending = $('lineEnding').value;
+      data = new TextEncoder().encode(input + (ending === 'crlf' ? '\r\n' : ending === 'lf' ? '\n' : ending === 'cr' ? '\r' : ''));
+    }
+    if (!data.length) return;
+    await serial.write(data);
+    $('txCount').textContent = Number($('txCount').textContent) + data.length;
+    log(`TX ${data.length} 字节：${$('sendHex').checked ? [...data].map(x => x.toString(16).padStart(2, '0')).join(' ') : input}`, 'tx');
+    if (!$('keepInput').checked) $('sendInput').value = '';
+  } catch (error) { setStatus(`发送失败：${error.message}`, 'error'); }
+}
+
+$('connectBtn').addEventListener('click', connectMonitor);
+$('disconnectBtn').addEventListener('click', disconnect);
+$('flashBtn').addEventListener('click', flash);
+$('startBtn').addEventListener('click', startApplication);
+$('sendBtn').addEventListener('click', send);
+$('pidReadBtn').addEventListener('click', () => sendPid('P?'));
+$('pidApplyBtn').addEventListener('click', applyPid);
+$('pidSaveBtn').addEventListener('click', () => sendPid('PS'));
+$('pidLoadBtn').addEventListener('click', () => sendPid('PL'));
+$('sendInput').addEventListener('keydown', event => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); send(); } });
+$('fileInput').addEventListener('change', event => loadFile(event.target.files[0]));
+$('dropzone').addEventListener('dragover', event => { event.preventDefault(); $('dropzone').classList.add('dragging'); });
+$('dropzone').addEventListener('dragleave', () => $('dropzone').classList.remove('dragging'));
+$('dropzone').addEventListener('drop', event => { event.preventDefault(); $('dropzone').classList.remove('dragging'); loadFile(event.dataTransfer.files[0]); });
+$('clearMonitor').addEventListener('click', () => { $('monitorOutput').textContent = ''; $('rxCount').textContent = '0'; });
+$('scopePause').addEventListener('click', () => {
+  if (!scope) return;
+  scope.paused = !scope.paused;
+  $('scopePause').textContent = scope.paused ? '继续' : '暂停';
+  if (scope.paused) setScopeState('已暂停', 'paused');
+  else { scope.clear(); updateScopeReadouts(); setScopeState('等待 PA28 信号'); }
+});
+$('scopeClear').addEventListener('click', () => { scope?.clear(); updateScopeReadouts(); setScopeState('等待 PA28 信号'); });
+$('scopeWindow').addEventListener('change', () => scope?.setWindow(Number($('scopeWindow').value)));
+$('clearLog').addEventListener('click', () => { $('log').textContent = ''; logLines = 0; });
+if (!('serial' in navigator)) setStatus('当前浏览器不支持 Web Serial，请使用桌面版 Chrome 或 Edge', 'error');
+else if (window.location.protocol === 'file:') setStatus('本地文件模式：若浏览器阻止串口，请双击 start-local.cmd 打开 127.0.0.1 页面');
+updateButtons();
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1526">
+  <title>MSPM0G3507 本地串口工具</title>
+  <!-- INLINE_STYLES -->
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">M0</span><div><strong>MSPM0 STUDIO</strong><small>本地串口烧录与监视器</small></div></div>
+      <div class="top-actions"><span class="port-pill"><span class="status-dot" id="statusDot"></span><span id="portLabel">未连接</span></span><button id="connectBtn" class="button button-primary">连接串口</button><button id="disconnectBtn" class="button button-quiet" disabled>断开</button></div>
+    </header>
+
+    <main>
+      <div class="hero"><div><div class="eyebrow">MSPM0G3507 · UART BSL</div><h1>固件烧录，一目了然。</h1><p>选择 Intel HEX 固件，进入 BSL 模式后写入；在同一页面查看应用串口输出并发送指令。</p></div><div class="hero-chip"><span>目标芯片</span><strong>MSPM0G3507</strong><small>128 KB MAIN FLASH</small></div></div>
+      <div class="status-banner"><span class="pulse"></span><span id="statusText" role="status" aria-live="polite">准备就绪，选择固件或连接串口</span></div>
+
+      <div class="workspace-grid">
+        <section class="panel flash-panel" aria-labelledby="flashTitle">
+          <div class="panel-heading"><div><span class="section-index">01 / FLASH</span><h2 id="flashTitle">固件烧录</h2><p>通过 ROM BSL 写入主 Flash</p></div><span class="panel-icon">↓</span></div>
+          <div class="step"><span class="step-number">1</span><div><strong>进入 BSL 模式</strong><p>按住 BSL 键 → 按 RST → 松开 RST → 松开 BSL。<br>进入后请在 10 秒内开始烧录。</p></div></div>
+          <div class="step"><span class="step-number">2</span><div class="step-content"><strong>选择固件</strong><label class="dropzone" id="dropzone" for="fileInput"><input id="fileInput" type="file" accept=".hex,.ihex,text/plain"><span class="upload-glyph">⌁</span><span id="fileName">选择 Intel HEX 固件</span><small id="fileDetails">点击选择或拖放 .hex 文件</small></label></div></div>
+          <div class="step"><span class="step-number">3</span><div class="step-content"><strong>烧录设置</strong><div class="field-grid"><label>BSL 波特率<select id="flashBaud"><option>9600</option><option>19200</option><option>38400</option><option>57600</option><option selected>115200</option><option>4800</option><option>1000000</option></select></label><label>BSL 密码 <span class="hint">出厂默认全 FF</span><input id="password" type="text" value="FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF" spellcheck="false" autocomplete="off" aria-label="32 字节 BSL 密码，64 位十六进制"></label></div><p class="fineprint">先以 9600 bps 连接 BSL，再切换到所选速率。仅支持芯片主 Flash 地址 0x00000–0x1FFFF。</p></div></div>
+          <div class="flash-footer"><div class="progress-meta"><span>烧录进度</span><strong id="progressLabel">0%</strong></div><progress id="progress" max="100" value="0"></progress><div class="button-row"><button id="flashBtn" class="button button-primary button-wide" disabled>开始烧录</button><button id="startBtn" class="button button-outline" disabled>启动应用</button></div><p class="fineprint">烧录将擦除主 Flash；每块写入均检查芯片返回的执行结果。不会更改 Non-main 配置区。</p></div>
+        </section>
+
+        <section class="panel monitor-panel" aria-labelledby="monitorTitle">
+          <div class="panel-heading"><div><span class="section-index">02 / SERIAL MONITOR</span><h2 id="monitorTitle">串口监视器</h2><p>实时收发应用数据</p></div><span class="panel-icon">↔</span></div>
+          <div class="monitor-toolbar"><label>监视器波特率<select id="monitorBaud"><option>1200</option><option>2400</option><option>4800</option><option>9600</option><option>19200</option><option>38400</option><option>57600</option><option selected>115200</option><option>230400</option><option>460800</option><option>921600</option></select></label><div class="counters"><span>RX <b id="rxCount">0</b> B</span><span>TX <b id="txCount">0</b> B</span></div></div>
+          <div class="monitor-content-grid"><div class="terminal-column">
+          <div class="terminal-head"><span><i></i> SERIAL OUTPUT</span><button id="clearMonitor" class="text-button">清空</button></div>
+          <pre id="monitorOutput" class="terminal" aria-label="串口接收内容"></pre>
+          </div><section class="pid-panel" aria-labelledby="pidTitle">
+            <div class="pid-heading"><h3 id="pidTitle">PID 参数</h3><button id="pidReadBtn" class="text-button" disabled>读取</button></div>
+            <div class="pid-values"><div><strong>RAM · 当前运行</strong><span id="pidRam">待读取</span></div><div><strong>FLASH · 已保存</strong><span id="pidFlash">待读取</span></div></div>
+            <div class="pid-inputs"><label>Kp<input id="pidKp" type="number" min="0" max="100000" step="1" value="4000"></label><label>Ki<input id="pidKi" type="number" min="0" max="100000" step="1" value="1500"></label><label>Kd<input id="pidKd" type="number" min="0" max="100000" step="1" value="0"></label></div>
+            <div class="pid-actions"><button id="pidApplyBtn" class="button button-primary" disabled>应用到 RAM</button><button id="pidSaveBtn" class="button button-outline" disabled>保存到 FLASH</button><button id="pidLoadBtn" class="button button-quiet" disabled>从 FLASH 载入</button></div>
+            <p class="fineprint">应用后立即生效；保存会让电机停止，并写入 Flash。烧录新固件会擦除已保存参数。</p>
+            <span id="pidMessage" class="pid-message" role="status" aria-live="polite">连接后自动读取参数</span>
+          </section></div>
+          <div class="monitor-options"><label><input id="rxHex" type="checkbox"> HEX 显示</label><label><input id="autoScroll" type="checkbox" checked> 自动滚动</label></div>
+          <div class="send-area"><label for="sendInput">发送数据</label><div class="send-row"><textarea id="sendInput" rows="2" placeholder="输入要发送的内容；Enter 发送，Shift+Enter 换行"></textarea><button id="sendBtn" class="button button-primary" disabled>发送 ↗</button></div><div class="send-options"><label><input id="sendHex" type="checkbox"> HEX 发送</label><label><input id="keepInput" type="checkbox"> 保留输入</label><label>行尾<select id="lineEnding"><option value="none">无</option><option value="lf">LF</option><option value="cr">CR</option><option value="crlf" selected>CRLF</option></select></label></div></div>
+        </section>
+      </div>
+
+      <section class="scope-panel" aria-labelledby="scopeTitle">
+        <div class="scope-heading"><div><span class="section-index">03 / PA28 INPUT</span><h2 id="scopeTitle">舵机信号波形</h2><p>逐脉冲边沿计时 · 数字波形重建</p></div><div class="scope-controls"><span id="scopeState" class="scope-state">等待信号</span><label>时间窗<select id="scopeWindow"><option value="20000">20 ms</option><option value="50000">50 ms</option><option value="100000" selected>100 ms</option><option value="200000">200 ms</option></select></label><button id="scopePause" class="button button-outline">暂停</button><button id="scopeClear" class="button button-quiet">清除</button></div></div>
+        <div class="scope-readouts"><div><span>高电平</span><strong id="scopeHigh">—</strong></div><div><span>低电平</span><strong id="scopeLow">—</strong></div><div><span>周期</span><strong id="scopePeriod">—</strong></div><div><span>频率</span><strong id="scopeFrequency">—</strong></div><div><span>收到 / 丢帧</span><strong id="scopeSamples">0 / 0</strong></div></div>
+        <div class="scope-screen"><canvas id="scopeCanvas" aria-label="PA28 数字输入波形，高低电平随时间变化"></canvas></div>
+        <div class="scope-foot"><span>PA28 · 接收器信号与开发板共地 · 115200 bps</span><label><input id="showWaveRaw" type="checkbox"> 在串口窗口显示逐脉冲数据</label><span>按实际捕获的每周期高电平与周期重建；不显示模拟电压或毛刺形状</span></div>
+      </section>
+
+      <section class="log-panel" aria-labelledby="logTitle"><div class="log-heading"><div><span class="section-index">04 / ACTIVITY</span><h2 id="logTitle">操作日志</h2></div><button id="clearLog" class="text-button">清空日志</button></div><div id="log" class="log-list" aria-live="polite"></div></section>
+      <footer>本地运行 · Web Serial · 8N1 <span>USB 转串口接线：TX → PA11 (BSL_RX)，RX → PA10 (BSL_TX)，共地</span></footer>
+    </main>
+  </div>
+  <!-- INLINE_SCRIPTS -->
+</body>
+</html>

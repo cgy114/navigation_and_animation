@@ -8,6 +8,9 @@
 #include "command.h"
 #include "odometry.h"
 #include "oled.h"
+#include "pid_store.h"
+#include "servo.h"
+#include "battery.h"
 
 static void send_int(int v)
 {
@@ -53,6 +56,7 @@ static void send_fixed1(float v)
 static void print_status(void)
 {
     const OdomState *o = motion_get_odom();
+    uint32_t battery_mv;
 
     debug_uart_send_string("r=");
     send_fixed1(uart_imu_roll() * 57.2958f);
@@ -72,11 +76,31 @@ static void print_status(void)
     send_int((int)(o->v_left * 1000.0f));
     debug_uart_send_string(" vR=");
     send_int((int)(o->v_right * 1000.0f));
+    debug_uart_send_string(" | bat=");
+    if (battery_get_voltage_mv(&battery_mv))
+    {
+        send_int((int)(battery_mv / 1000U));
+        debug_uart_send_char('.');
+        debug_uart_send_char((char)('0' + (battery_mv / 100U) % 10U));
+        debug_uart_send_char((char)('0' + (battery_mv / 10U) % 10U));
+        debug_uart_send_char((char)('0' + battery_mv % 10U));
+        debug_uart_send_char('V');
+    }
+    else if (battery_get_adc_mv(&battery_mv))
+    {
+        debug_uart_send_string("UNCAL adc_mv=");
+        send_int((int)battery_mv);
+    }
+    else
+    {
+        debug_uart_send_string("ERR");
+    }
     debug_uart_send_string("\r\n");
 }
 
 int main(void)
 {
+    PidGains saved_gains;
     uint8_t imu_started = 0;
     uint32_t last_lost_print = 0;
     uint32_t last_status_print = 0;
@@ -89,9 +113,13 @@ int main(void)
     uart_imu_init();
     encoder_init();
     motor_init();
+    servo_init();
+    battery_init();
     timer_init();
 
     motion_init();
+    if (pid_store_load(&saved_gains))
+        motion_set_pid((float)saved_gains.kp, (float)saved_gains.ki, (float)saved_gains.kd);
     command_init();
     oled_show_hello();
 
@@ -109,6 +137,7 @@ int main(void)
     while (1)
     {
         command_poll();
+        battery_poll(g_ms_tick);
 
         if (uart_imu_poll())
         {
