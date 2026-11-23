@@ -197,7 +197,9 @@ static const DL_TimerG_ClockConfig gPWM_MOTORClockConfig = {
 };
 
 static const DL_TimerG_PWMConfig gPWM_MOTORConfig = {
-    .pwmMode = DL_TIMER_PWM_MODE_EDGE_ALIGN,
+    /* Count up so the compare value is the high time in a PWM period:
+     * 0 = 0% duty and 10000 = 100% duty. motor.c uses this scale directly. */
+    .pwmMode = DL_TIMER_PWM_MODE_EDGE_ALIGN_UP,
     .period = 10000,
     .isTimerWithFourCC = false,
     .startTimer = DL_TIMER_START,

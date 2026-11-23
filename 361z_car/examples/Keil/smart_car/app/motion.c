@@ -97,6 +97,18 @@ void motion_update(int left_delta, int right_delta, float yaw_rad, int imu_ok)
         return;
     }
 
+    /* Target is zero on both wheels: coast instead of fighting the encoders.
+     * Without this the PID sees hand rotation as an error and drives the
+     * motors backwards, which feels like the wheels are locked. */
+    if (fabsf(target_v) < 0.001f && fabsf(target_w) < 0.001f)
+    {
+        pid_reset(&pid_left);
+        pid_reset(&pid_right);
+        odom_update(left_delta, right_delta, yaw_rad, imu_ok);
+        motor_stop();
+        return;
+    }
+
     v_left  = (float)left_delta  * METERS_PER_COUNT / ODOM_DT;
     v_right = (float)right_delta * METERS_PER_COUNT / ODOM_DT;
 

@@ -7,9 +7,17 @@
 #include "pid_store.h"
 #include "servo.h"
 #include "battery.h"
+#include "uart_pi.h"
 
-static char line[64];
-static uint8_t line_len = 0;
+typedef struct
+{
+    char line[64];
+    uint8_t length;
+    uint8_t overflow;
+} CommandLine;
+
+static CommandLine debug_line;
+static CommandLine pi_line;
 static uint32_t last_cmd_tick = 0;
 static uint8_t active = 0;
 
@@ -41,9 +49,10 @@ static void print_help(void)
         "  3/4                    left forward/right backward, or reverse\r\n"
         "  0                      stop both wheels\r\n"
         "  center                 PA15 servo\r\n"
-        "                         1524us high / 13955us period (boot)\r\n"
+        "                         1500us high / 20000us period (boot)\r\n"
         "  sweep                  left 1300us 1s / right 1700us 1s\r\n"
         "  on / off               right 1700us / left 1300us\r\n"
+        "  D <pulse_us>           set servo pulse width (1000..2000 us)\r\n"
         "  B?                     show PA25 ADC raw/pin/battery millivolts\r\n"
         "  M <v_mm_s> <w_mrad_s>  move (2s timeout)\r\n"
         "  G <v_mm_s> <w_mrad_s>  move continuous\r\n"
@@ -51,6 +60,7 @@ static void print_help(void)
         "  R                      reset odom + encoder counts\r\n"
         "  E                      show encoder totals\r\n"
         "  P?                     show RAM and Flash PID gains\r\n"
+        "  P <pwm>                direct both wheels (-10000..10000)\r\n"
         "  P <kp> <ki> <kd>       set RAM PID gains (0..100000)\r\n"
         "  PS / PL / PD           save Flash / load Flash / RAM defaults\r\n"
         "  ?                      help\r\n"
@@ -178,7 +188,7 @@ static void handle_line(char *s)
     }
     else if (command_is(p, "center"))
     {
-        servo_set_pulse_us(1524U);
+        servo_set_pulse_us(SERVO_CENTER_PULSE_US);
         debug_uart_send_string("OK CENTER\r\n");
     }
     else if (command_is(p, "sweep"))
@@ -188,13 +198,27 @@ static void handle_line(char *s)
     }
     else if (command_is(p, "on"))
     {
-        servo_set_pulse_us(1700U);
+        servo_set_pulse_us(SERVO_RIGHT_PULSE_US);
         debug_uart_send_string("OK ON\r\n");
     }
     else if (command_is(p, "off"))
     {
-        servo_set_pulse_us(1300U);
+        servo_set_pulse_us(SERVO_LEFT_PULSE_US);
         debug_uart_send_string("OK OFF\r\n");
+    }
+    else if (*p == 'D' || *p == 'd')
+    {
+        q = p + 1;
+        if (parse_int(&q, &a) && at_end(q) &&
+            a >= (int)SERVO_MIN_PULSE_US && a <= (int)SERVO_MAX_PULSE_US)
+        {
+            servo_set_pulse_us((unsigned)a);
+            debug_uart_send_string("OK D\r\n");
+        }
+        else
+        {
+            debug_uart_send_string("ERR D\r\n");
+        }
     }
     else if (*p == 'M' || *p == 'm' || *p == 'G' || *p == 'g')
     {
@@ -263,23 +287,32 @@ static void handle_line(char *s)
             motion_set_pid((float)gains.kp, (float)gains.ki, (float)gains.kd);
             debug_uart_send_string("OK PD\r\n");
             print_pid_status();
-        } else if (parse_int(&q, &a) &&
-                   parse_int(&q, &b) &&
-                   parse_int(&q, &c) && at_end(q))
-        {
-            PidGains gains;
-            gains.kp = a; gains.ki = b; gains.kd = c;
-            if (pid_store_valid_gains(&gains)) {
-                motion_set_pid((float)a, (float)b, (float)c);
-                debug_uart_send_string("OK P\r\n");
-                print_pid_status();
+        } else {
+            const char *single = q;
+            if (parse_int(&single, &a) && at_end(single)) {
+                if (a >= -10000 && a <= 10000) {
+                    active = 0;
+                    motion_set_direct_pwm(a, a);
+                    debug_uart_send_string("OK P PWM\r\n");
+                } else {
+                    debug_uart_send_string("ERR P PWM\r\n");
+                }
+            } else if (parse_int(&q, &a) &&
+                       parse_int(&q, &b) &&
+                       parse_int(&q, &c) && at_end(q))
+            {
+                PidGains gains;
+                gains.kp = a; gains.ki = b; gains.kd = c;
+                if (pid_store_valid_gains(&gains)) {
+                    motion_set_pid((float)a, (float)b, (float)c);
+                    debug_uart_send_string("OK P\r\n");
+                    print_pid_status();
+                } else {
+                    debug_uart_send_string("ERR P\r\n");
+                }
             } else {
                 debug_uart_send_string("ERR P\r\n");
             }
-        }
-        else
-        {
-            debug_uart_send_string("ERR P\r\n");
         }
     }
     else if (*p == '?')
@@ -293,26 +326,66 @@ static void handle_line(char *s)
 }
 
 /* Short commands must work even when the terminal sends no line ending. */
-static void dispatch_short_command(void)
+static void dispatch_short_command(CommandLine *input)
 {
-    line[line_len] = 0;
-    if (command_is(line, "on") || command_is(line, "off") ||
-        command_is(line, "p?") || command_is(line, "ps") ||
-        command_is(line, "pl") || command_is(line, "pd") ||
-        command_is(line, "sweep") || command_is(line, "center") ||
-        command_is(line, "b?"))
+    input->line[input->length] = 0;
+    if (command_is(input->line, "on") || command_is(input->line, "off") ||
+        command_is(input->line, "p?") || command_is(input->line, "ps") ||
+        command_is(input->line, "pl") || command_is(input->line, "pd") ||
+        command_is(input->line, "sweep") || command_is(input->line, "center") ||
+        command_is(input->line, "b?"))
     {
-        handle_line(line);
-        line_len = 0;
+        handle_line(input->line);
+        input->length = 0;
     }
 }
 
 void command_init(void)
 {
-    line_len = 0;
+    debug_line.length = 0;
+    debug_line.overflow = 0;
+    pi_line.length = 0;
+    pi_line.overflow = 0;
     last_cmd_tick = 0;
     active = 0;
     print_help();
+}
+
+static void process_char(CommandLine *input, char c)
+{
+    if (c == '\r' || c == '\n')
+    {
+        if (input->overflow)
+        {
+            debug_uart_send_string("ERR LINE\r\n");
+        }
+        else if (input->length != 0)
+        {
+            input->line[input->length] = 0;
+            handle_line(input->line);
+        }
+        input->length = 0;
+        input->overflow = 0;
+        return;
+    }
+
+    if (input->overflow) return;
+
+    /* Single digits work immediately, with or without a trailing newline. */
+    if (input->length == 0 && c >= '0' && c <= '4')
+    {
+        handle_wheel_command(c);
+        return;
+    }
+
+    if (input->length >= sizeof(input->line) - 1)
+    {
+        input->overflow = 1;
+        return;
+    }
+
+    input->line[input->length++] = c;
+    dispatch_short_command(input);
 }
 
 void command_poll(void)
@@ -321,26 +394,11 @@ void command_poll(void)
 
     while (debug_uart_get_char(&c))
     {
-        /* Single digits work immediately, with or without a trailing newline. */
-        if (line_len == 0 && c >= '0' && c <= '4')
-        {
-            handle_wheel_command(c);
-            continue;
-        }
-
-        if (c == '\r' || c == '\n')
-        {
-            if (line_len != 0) {
-                line[line_len] = 0;
-                handle_line(line);
-            }
-            line_len = 0;
-        }
-        else if (line_len < sizeof(line) - 1)
-        {
-            line[line_len++] = c;
-            dispatch_short_command();
-        }
+        process_char(&debug_line, c);
+    }
+    while (uart_pi_get_char(&c))
+    {
+        process_char(&pi_line, c);
     }
 }
 

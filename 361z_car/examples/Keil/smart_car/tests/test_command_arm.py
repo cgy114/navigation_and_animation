@@ -41,11 +41,15 @@ class Firmware:
                     self.mu.mem_write(address, section.data())
         self.gains = (4000.0, 1500.0, 0.0)
         self.rx = deque()
+        self.pi_rx = deque()
         self.output = ''
         self.wheels = []
         self.targets = []
+        self.servo_pulses = []
+        self.stops = 0
         names = ('debug_uart_send_string', 'debug_uart_send_char',
-                 'debug_uart_get_char', 'motion_get_pid', 'motion_set_pid',
+                 'debug_uart_get_char', 'uart_pi_get_char',
+                 'motion_get_pid', 'motion_set_pid',
                  'pid_store_load', 'servo_set_pulse_us', 'servo_start_sweep',
                  'motion_stop', 'motion_set_direct_pwm', 'motion_set_target',
                  'odom_reset', 'encoder_reset_totals', 'encoder_left_total',
@@ -73,9 +77,10 @@ class Firmware:
             self.output += text.decode('ascii')
         elif name == 'debug_uart_send_char':
             self.output += chr(r0 & 255)
-        elif name == 'debug_uart_get_char':
-            if self.rx:
-                mu.mem_write(r0, bytes([self.rx.popleft()]))
+        elif name in ('debug_uart_get_char', 'uart_pi_get_char'):
+            rx = self.rx if name == 'debug_uart_get_char' else self.pi_rx
+            if rx:
+                mu.mem_write(r0, bytes([rx.popleft()]))
                 mu.reg_write(UC_ARM_REG_R0, 1)
             else:
                 mu.reg_write(UC_ARM_REG_R0, 0)
@@ -88,16 +93,22 @@ class Firmware:
         elif name in ('pid_store_load', 'encoder_left_total', 'encoder_right_total'):
             mu.reg_write(UC_ARM_REG_R0, 0)
         elif name == 'motion_set_direct_pwm':
-            self.wheels.append((r0, r1))
+            self.wheels.append(tuple(struct.unpack('<i', struct.pack('<I', value))[0]
+                                     for value in (r0, r1)))
+        elif name == 'servo_set_pulse_us':
+            self.servo_pulses.append(r0)
+        elif name == 'motion_stop':
+            self.stops += 1
         elif name == 'motion_set_target':
             self.targets.append(tuple(struct.unpack('<f', struct.pack('<I', value))[0]
                                       for value in (r0, r1)))
         mu.reg_write(UC_ARM_REG_PC, mu.reg_read(UC_ARM_REG_LR))
 
-    def feed(self, *chunks):
+    def feed(self, *chunks, source='debug'):
         start = len(self.output)
+        rx = {'debug': self.rx, 'pi': self.pi_rx}[source]
         for chunk in chunks:
-            self.rx.extend(chunk.encode('ascii'))
+            rx.extend(chunk.encode('ascii'))
             self.mu.reg_write(UC_ARM_REG_SP, 0x20207F00)
             self.mu.reg_write(UC_ARM_REG_LR, 0x100001)
             self.mu.emu_start(self.symbols['command_poll'] | 1,
@@ -148,6 +159,61 @@ class TestCommandArm(unittest.TestCase):
         self.assertIn('OK G\r\n', firmware.feed('G -300 0\n'))
         self.assertAlmostEqual(firmware.targets[-1][0], -0.3, places=5)
         self.assertIn('OK 0\r\n', firmware.feed('0'))
+
+    def test_direct_pwm_and_pid_commands_on_both_links(self):
+        for source in ('debug', 'pi'):
+            firmware = Firmware()
+            for pwm in (0, 1, 10000, -10000):
+                with self.subTest(source=source, pwm=pwm):
+                    self.assertIn('OK P PWM\r\n',
+                                  firmware.feed(f'P {pwm}\n', source=source))
+                    self.assertEqual(firmware.wheels[-1], (pwm, pwm))
+                    self.assertEqual(firmware.gains, (4000, 1500, 0))
+            count = len(firmware.wheels)
+            for command in ('P 10001\n', 'P -10001\n', 'P 3 2\n'):
+                self.assertIn('ERR P', firmware.feed(command, source=source))
+                self.assertEqual(len(firmware.wheels), count)
+            self.assertIn('OK P\r\n',
+                          firmware.feed('P 3000 1000 0\n', source=source))
+            self.assertEqual(firmware.gains, (3000, 1000, 0))
+
+    def test_servo_commands_on_both_links(self):
+        for source in ('debug', 'pi'):
+            firmware = Firmware()
+            for pulse in (1000, 1500, 2000):
+                self.assertIn('OK D\r\n',
+                              firmware.feed(f'd {pulse}\r\n', source=source))
+                self.assertEqual(firmware.servo_pulses[-1], pulse)
+            count = len(firmware.servo_pulses)
+            for command in ('D 999\n', 'D 2001\n', 'D -1\n',
+                            'D 1500 extra\n', 'D\n'):
+                self.assertIn('ERR D\r\n', firmware.feed(command, source=source))
+                self.assertEqual(len(firmware.servo_pulses), count)
+
+    def test_fragmented_commands_from_different_links_are_independent(self):
+        firmware = Firmware()
+        self.assertEqual(firmware.feed('P 35'), '')
+        self.assertEqual(firmware.feed('d 15', source='pi'), '')
+        self.assertIn('OK P PWM\r\n', firmware.feed('00\n'))
+        self.assertEqual(firmware.wheels, [(3500, 3500)])
+        self.assertEqual(firmware.servo_pulses, [])
+        self.assertIn('OK D\r\n', firmware.feed('00\n', source='pi'))
+        self.assertEqual(firmware.servo_pulses, [1500])
+        self.assertIn('OK G\r\n', firmware.feed('G -300 0\n', source='pi'))
+        self.assertAlmostEqual(firmware.targets[-1][0], -0.3, places=5)
+        self.assertIn('OK 0\r\n', firmware.feed('0', source='pi'))
+        self.assertEqual(firmware.stops, 1)
+
+    def test_overlength_line_is_discarded_then_parser_recovers(self):
+        for source in ('debug', 'pi'):
+            firmware = Firmware()
+            self.assertIn('ERR LINE\r\n',
+                          firmware.feed('P 100' + ' ' * 70 + 'junk\n',
+                                        source=source))
+            self.assertEqual(firmware.wheels, [])
+            self.assertIn('OK P PWM\r\n',
+                          firmware.feed('P 200\n', source=source))
+            self.assertEqual(firmware.wheels, [(200, 200)])
 
 
 if __name__ == '__main__':

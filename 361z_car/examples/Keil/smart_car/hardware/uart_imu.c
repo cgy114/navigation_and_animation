@@ -82,7 +82,7 @@ void uart_imu_init(void)
 
     /* 40 MHz BUSCLK, 16x oversampling, 115200 baud */
     DL_UART_Main_setOversampling(UART1, DL_UART_OVERSAMPLING_RATE_16X);
-    DL_UART_Main_setBaudRateDivisor(UART1, 21, 45);
+    DL_UART_Main_setBaudRateDivisor(UART1, 21U, 45U);
 
     DL_UART_Main_enableInterrupt(UART1, DL_UART_MAIN_INTERRUPT_RX);
     DL_UART_Main_enable(UART1);

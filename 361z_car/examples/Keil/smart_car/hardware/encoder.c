@@ -6,6 +6,11 @@
 #define ENC2_A_IOMUX     IOMUX_PINCM15
 #define ENC2_B_IOMUX     IOMUX_PINCM16
 
+/* Report positive counts for physical wheel forward. Check this against
+ * positive motor PWM; each channel's raw quadrature polarity can differ. */
+#define ENCODER_LEFT_INVERT   1
+#define ENCODER_RIGHT_INVERT  0
+
 static volatile int32_t left_temp = 0;
 static volatile int32_t right_temp = 0;
 
@@ -119,8 +124,8 @@ void encoder_update(void)
     uint32_t primask = __get_PRIMASK();
 
     __disable_irq();
-    left_delta = left_temp;
-    right_delta = right_temp;
+    left_delta = ENCODER_LEFT_INVERT ? -left_temp : left_temp;
+    right_delta = ENCODER_RIGHT_INVERT ? -right_temp : right_temp;
     left_temp = 0;
     right_temp = 0;
     left_total += left_delta;

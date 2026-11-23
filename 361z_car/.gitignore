@@ -1,0 +1,35 @@
+# Keil build outputs
+Objects/
+Listings/
+*.o
+*.d
+*.axf
+*.hex
+*.bin
+*.map
+*.lst
+*.lnp
+*.dep
+*.build_log.htm
+*.htm
+*.iex
+*.crf
+
+# Keil per-user UI state
+*.uvguix.*
+*.uvoptx
+*.scvd
+JLinkLog.txt
+JLinkSettings.ini
+
+# SysConfig cache
+.metadata/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+Thumbs.db
+desktop.ini
+~$*

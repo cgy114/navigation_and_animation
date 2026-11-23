@@ -15,6 +15,12 @@
 
 #define MOTOR_PWM_MAX    10000
 
+/* Calibrate positive duty to physical wheel forward. The encoder must report
+ * positive speed for that movement; its raw polarity may differ by channel,
+ * so MOTOR_*_INVERT and ENCODER_*_INVERT need not have equal numeric values. */
+#define MOTOR_LEFT_INVERT   1
+#define MOTOR_RIGHT_INVERT  1
+
 static int32_t clamp_pwm(int32_t v)
 {
     if (v > MOTOR_PWM_MAX)  return MOTOR_PWM_MAX;
@@ -59,6 +65,7 @@ void motor_enable(int enable)
 static void motor_left(int32_t duty)
 {
     duty = clamp_pwm(duty);
+    if (MOTOR_LEFT_INVERT) duty = -duty;
 
     if (duty > 0)
     {
@@ -84,9 +91,8 @@ static void motor_left(int32_t duty)
 
 static void motor_right(int32_t duty)
 {
-    /* M2 is mounted mirrored: a positive duty must drive the wheel forward,
-     * which needs the opposite bridge polarity than M1. */
-    duty = clamp_pwm(-duty);
+    duty = clamp_pwm(duty);
+    if (MOTOR_RIGHT_INVERT) duty = -duty;
 
     if (duty > 0)
     {

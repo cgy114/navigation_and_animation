@@ -86,6 +86,7 @@ GPIO4.associatedPins[1].interruptPriority = "0";
 PWM1.$name                              = "PWM_MOTOR";
 PWM1.timerStartTimer                    = true;
 PWM1.timerCount                         = 10000;
+PWM1.pwmMode                            = "EDGE_ALIGN_UP";
 PWM1.peripheral.$assign                 = "TIMG7";
 PWM1.peripheral.ccp0Pin.$assign         = "PA26";
 PWM1.peripheral.ccp1Pin.$assign         = "PA27";

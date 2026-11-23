@@ -11,6 +11,9 @@
 #include "pid_store.h"
 #include "servo.h"
 #include "battery.h"
+#include "uart_pi.h"
+
+#define STATUS_PRINT_PERIOD_MS 500U
 
 static void send_int(int v)
 {
@@ -108,7 +111,8 @@ int main(void)
     SYSCFG_DL_init();
 
     debug_uart_init();
-    debug_uart_set_baud_115200();
+    debug_uart_set_baud_9600();
+    uart_pi_init();
 
     uart_imu_init();
     encoder_init();
@@ -136,6 +140,8 @@ int main(void)
 
     while (1)
     {
+        debug_uart_poll();
+        uart_pi_poll();
         command_poll();
         battery_poll(g_ms_tick);
 
@@ -176,7 +182,7 @@ int main(void)
                 }
             }
 
-            if ((uint32_t)(g_ms_tick - last_status_print) >= 100)
+            if ((uint32_t)(g_ms_tick - last_status_print) >= STATUS_PRINT_PERIOD_MS)
             {
                 last_status_print = g_ms_tick;
                 print_status();
