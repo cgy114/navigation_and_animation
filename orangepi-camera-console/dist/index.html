@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101817">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+  <title>香橙派摄像头</title>
+</head>
+<body>
+  <main class="console">
+    <header class="masthead">
+      <div>
+        <p class="device">Orange Pi 5 Pro</p>
+        <h1>香橙派摄像头</h1>
+      </div>
+      <span id="connection" class="connection" data-state="idle" role="status">检查连接中</span>
+    </header>
+    <nav class="tabs" role="tablist" aria-label="工具">
+      <button class="tab" id="tab-camera" role="tab" aria-selected="true" aria-controls="panel-camera">实时画面</button>
+      <button class="tab" id="tab-logs" role="tab" aria-selected="false" aria-controls="panel-logs">实时日志</button>
+      <button class="tab" id="tab-msp" role="tab" aria-selected="false" aria-controls="panel-msp">烧录 / 串口</button>
+    </nav>
+    <div class="layout" id="panel-camera" role="tabpanel" aria-labelledby="tab-camera">
+      <section class="viewer connection-controls-first" aria-label="实时画面">
+        <div class="viewer-header">
+          <h2>实时预览</h2>
+          <span id="videoState">等待连接</span>
+        </div>
+        <div class="image-area">
+          <img id="preview" alt="香橙派 CAM2 实时画面" hidden>
+          <div id="placeholder" class="placeholder">
+            <span class="viewfinder" aria-hidden="true"></span>
+            <p id="previewMessage">连接香橙派后显示画面</p>
+          </div>
+        </div>
+        <div class="viewer-footer">
+          <span>CAM2 · OV13855</span>
+          <span id="profile">1280 × 960 · 15 帧/秒</span>
+        </div>
+      </section>
+      <aside class="sidebar" aria-labelledby="link-heading">
+        <h2 id="link-heading">设备连接</h2>
+        <dl>
+          <div><dt>连接方式</dt><dd id="route">—</dd></div>
+          <div><dt>香橙派地址</dt><dd id="boardHost">—</dd></div>
+          <div><dt>画面通道</dt><dd>SSH 转发 · 127.0.0.1:18877</dd></div>
+          <div><dt>备用热点</dt><dd id="hotspotSsid">—</dd></div>
+        </dl>
+        <div class="actions">
+          <button id="connect" type="button">连接香橙派</button>
+          <button id="toggle" type="button" class="secondary" disabled>暂停预览</button>
+        </div>
+        <div class="settings">
+          <label class="quality">
+            <span>分辨率</span>
+            <select id="resolution">
+              <option value="640x480">640 × 480</option>
+              <option value="800x600">800 × 600</option>
+              <option value="1024x768">1024 × 768</option>
+              <option value="1280x960" selected>1280 × 960</option>
+              <option value="1920x1440">1920 × 1440</option>
+            </select>
+          </label>
+          <label class="quality">
+            <span>帧率</span>
+            <select id="fps"></select>
+          </label>
+        </div>
+        <p class="message" id="connectionMessage" role="status"></p>
+      </aside>
+    </div>
+    <section class="panel log-layout" id="panel-logs" role="tabpanel" aria-labelledby="tab-logs" hidden>
+      <div class="log-toolbar">
+        <label class="quality">
+          <span>日志来源</span>
+          <select id="logSource">
+            <option value="camera" selected>摄像头服务</option>
+            <option value="system">系统全部日志</option>
+            <option value="kernel">内核日志</option>
+            <option value="ssh">SSH / 登录</option>
+            <option value="custom">自定义…</option>
+          </select>
+        </label>
+        <div class="custom-source" id="customSource" hidden>
+          <select id="customType" aria-label="自定义类型">
+            <option value="unit">systemd 服务</option>
+            <option value="file">日志文件</option>
+            <option value="cmd">命令输出</option>
+          </select>
+          <input id="customValue" type="text" spellcheck="false" placeholder="例如 orangepi-camera-live.service 或 /var/log/syslog">
+        </div>
+        <button id="logStart" type="button">开始读取</button>
+        <button id="logPause" type="button" class="secondary" disabled>暂停</button>
+        <button id="logClear" type="button" class="secondary">清空</button>
+        <label class="check"><input id="autoScroll" type="checkbox" checked> 自动滚动</label>
+        <input id="logFilter" class="filter" type="search" placeholder="过滤关键字（支持正则 /pattern/）" spellcheck="false">
+      </div>
+      <div class="log-bar">
+        <span id="logStatus" data-state="idle">未连接</span>
+        <span id="logMeta" class="log-meta"></span>
+        <span id="logCount" class="log-count">0 行</span>
+      </div>
+      <div class="log-window" id="logWindow" tabindex="0" aria-live="off">
+        <p class="log-empty" id="logEmpty">选择日志来源后点击「开始读取」，日志会实时显示在这里。</p>
+      </div>
+    </section>
+    <section class="panel msp-panel" id="panel-msp" role="tabpanel" aria-labelledby="tab-msp" hidden>
+      <div class="msp-grid">
+        <section class="card">
+          <h2>烧录 MSPM0G3507</h2>
+          <p class="hint">芯片串口接在香橙派上。先让芯片进入 BSL 模式（按住 BSL → 按 RST → 松 RST → 松 BSL），10 秒内点击开始烧录。</p>
+          <div class="field-row">
+            <label class="quality">
+              <span>串口</span>
+              <select id="flashPort"></select>
+            </label>
+            <button id="refreshPorts" type="button" class="secondary">刷新</button>
+          </div>
+          <label class="quality">
+            <span>固件文件（.hex）</span>
+            <input id="hexFile" type="file" accept=".hex,text/plain">
+          </label>
+          <div class="field-row">
+            <label class="quality">
+              <span>BSL 波特率</span>
+              <select id="flashBaud">
+                <option value="9600">9600</option>
+                <option value="19200">19200</option>
+                <option value="57600">57600</option>
+                <option value="115200" selected>115200</option>
+                <option value="1000000">1 000 000</option>
+                <option value="2000000">2 000 000</option>
+              </select>
+            </label>
+            <label class="check"><input id="flashStart" type="checkbox" checked> 烧录后启动应用</label>
+          </div>
+          <button id="flashButton" type="button">开始烧录</button>
+          <progress id="flashProgress" max="100" value="0"></progress>
+          <div class="log-window msp-log" id="flashLog"></div>
+        </section>
+        <section class="card">
+          <h2>串口监视</h2>
+          <div class="field-row">
+            <label class="quality">
+              <span>串口</span>
+              <select id="monitorPort"></select>
+            </label>
+            <label class="quality">
+              <span>波特率</span>
+              <select id="monitorBaud">
+                <option>9600</option>
+                <option>19200</option>
+                <option>57600</option>
+                <option selected>115200</option>
+                <option>230400</option>
+                <option>460800</option>
+                <option>921600</option>
+              </select>
+            </label>
+          </div>
+          <div class="field-row">
+            <button id="monitorConnect" type="button">连接串口</button>
+            <button id="monitorDisconnect" type="button" class="secondary" disabled>断开</button>
+            <label class="check"><input id="hexView" type="checkbox"> HEX 显示</label>
+            <label class="check"><input id="monitorAutoScroll" type="checkbox" checked> 自动滚动</label>
+          </div>
+          <div class="log-window msp-log" id="monitorLog"></div>
+          <div class="field-row">
+            <input id="sendText" class="send-input" type="text" placeholder="发送内容" spellcheck="false">
+            <select id="sendMode">
+              <option value="text">文本</option>
+              <option value="hex">HEX</option>
+            </select>
+            <label class="check"><input id="sendNewline" type="checkbox" checked> 加换行</label>
+            <button id="sendButton" type="button" disabled>发送</button>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
